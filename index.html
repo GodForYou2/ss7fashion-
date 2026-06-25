@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S&S7 Fashion Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-slate-900 text-slate-100 font-sans antialiased min-h-screen pb-10">
+
+    <div class="max-w-4xl mx-auto px-4 pt-6">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-4 mb-6">
+            <div>
+                <h1 class="text-2xl font-bold text-indigo-400">👑 S&S7 FASHION</h1>
+                <p id="reportTitle" class="text-sm text-slate-400 mt-1">Loading Report...</p>
+            </div>
+            <span class="bg-indigo-900/50 text-indigo-300 text-xs px-3 py-1.5 rounded-full border border-indigo-500/30 font-mono">⚡ LIVE DATA</span>
+        </div>
+
+        <div class="grid grid-cols-3 gap-3 mb-6">
+            <div class="bg-slate-800/60 border border-slate-700/50 rounded-2xl p-4 shadow-xl">
+                <p class="text-xs text-slate-400 uppercase tracking-wider font-medium">💰 ယူဈေးရင်း</p>
+                <p id="txtCost" class="text-lg font-bold text-rose-400 mt-1">0 <span class="text-xs text-slate-500">MMK</span></p>
+            </div>
+            <div class="bg-slate-800/60 border border-slate-700/50 rounded-2xl p-4 shadow-xl">
+                <p class="text-xs text-slate-400 uppercase tracking-wider font-medium">💵 အရောင်းရငွေ</p>
+                <p id="txtRevenue" class="text-lg font-bold text-sky-400 mt-1">0 <span class="text-xs text-slate-500">MMK</span></p>
+            </div>
+            <div class="bg-slate-800/60 border border-slate-700/50 rounded-2xl p-4 shadow-xl">
+                <p class="text-xs text-slate-400 uppercase tracking-wider font-medium">📈 အသားတင်အမြတ်</p>
+                <p id="txtProfit" class="text-lg font-bold text-emerald-400 mt-1">0 <span class="text-xs text-slate-500">MMK</span></p>
+            </div>
+        </div>
+
+        <div class="bg-slate-800/40 border border-slate-700/40 rounded-2xl p-4 mb-6 shadow-xl">
+            <h3 class="text-sm font-semibold text-slate-300 mb-4 flex items-center gap-2">📊 Analytics Visualization</h3>
+            <div class="relative w-full h-64">
+                <canvas id="analyticsChart"></canvas>
+            </div>
+        </div>
+
+        <div class="bg-slate-800/50 border border-slate-700/50 rounded-2xl shadow-xl overflow-hidden">
+            <div class="px-4 py-3 bg-slate-800/80 border-b border-slate-700/60">
+                <h3 class="text-sm font-bold text-slate-200">📝 အသေးစိတ် စာရင်းဇယားပြဇယား</h3>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-900/40 text-xs uppercase tracking-wider text-slate-400 border-b border-slate-700/50">
+                            <th class="py-3 px-4 font-semibold">အမည် / ရက်စွဲ</th>
+                            <th class="py-3 px-4 text-center font-semibold">အရေအတွက်</th>
+                            <th class="py-3 px-4 text-right font-semibold">အရောင်းရငွေ</th>
+                            <th class="py-3 px-4 text-right font-semibold">အမြတ်</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody" class="text-sm divide-y divide-slate-800 text-slate-300">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // URL မှ Data ဖတ်ပြီး Unicode (မြန်မာစာ) မပျက်အောင် Decode လုပ်သည့် စနစ်
+        function getJsonFromUrl() {
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                const base64Str = urlParams.get('data');
+                const type = urlParams.get('type') || 'report';
+                if (!base64Str) return { type, data: null };
+
+                const binaryString = atob(base64Str);
+                const bytes = new Uint8Array(binaryString.length);
+                for (let i = 0; i < binaryString.length; i++) {
+                    bytes[i] = binaryString.charCodeAt(i);
+                }
+                const decoder = new TextDecoder('utf-8');
+                return { type, data: JSON.parse(decoder.decode(bytes)) };
+            } catch (e) {
+                console.error("Decode Error", e);
+                return { type: 'error', data: null };
+            }
+        }
+
+        const { type, data } = getJsonFromUrl();
+        const fmt = (num) => Number(num).toLocaleString();
+
+        if (data) {
+            // Set Header Text
+            document.getElementById('reportTitle').innerText = data.title || "S&S7 Financial Report";
+            
+            // Set KPI Figures
+            document.getElementById('txtCost').innerHTML = `${fmt(data.total_buy)} <span class="text-xs text-slate-500">MMK</span>`;
+            document.getElementById('txtRevenue').innerHTML = `${fmt(data.total_sell)} <span class="text-xs text-slate-500">MMK</span>`;
+            document.getElementById('txtProfit').innerHTML = `${fmt(data.total_profit)} <span class="text-xs text-slate-500">MMK</span>`;
+
+            // Table Rows Generation
+            const tableBody = document.getElementById('tableBody');
+            let tableHtml = '';
+            
+            data.items.forEach(item => {
+                tableHtml += `
+                    <tr class="hover:bg-slate-800/30 transition-colors">
+                        <td class="py-3.5 px-4 font-medium text-slate-200">${item.name}</td>
+                        <td class="py-3.5 px-4 text-center font-mono text-indigo-300">${item.qty ? fmt(item.qty) + ' ထည်' : '-'}</td>
+                        <td class="py-3.5 px-4 text-right font-mono text-sky-400">${fmt(item.sell)}</td>
+                        <td class="py-3.5 px-4 text-right font-mono text-emerald-400">+${fmt(item.profit)}</td>
+                    </tr>
+                `;
+            });
+            tableBody.innerHTML = tableHtml;
+
+            // Chart Rendering Logic (Chart.js)
+            const ctx = document.getElementById('analyticsChart').getContext('2d');
+            
+            new Chart(ctx, {
+                type: type === 'best' ? 'bar' : 'line',
+                data: {
+                    labels: data.chart_labels,
+                    datasets: [
+                        {
+                            label: 'အရောင်းရငွေ (Revenue)',
+                            data: data.chart_sell,
+                            backgroundColor: 'rgba(56, 189, 248, 0.2)',
+                            borderColor: '#38bdf8',
+                            borderWidth: 2,
+                            tension: 0.3,
+                            fill: type !== 'best'
+                        },
+                        {
+                            label: 'အသားတင်အမြတ် (Profit)',
+                            data: data.chart_profit,
+                            backgroundColor: 'rgba(52, 211, 153, 0.2)',
+                            borderColor: '#34d399',
+                            borderWidth: 2,
+                            tension: 0.3,
+                            fill: type !== 'best'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { labels: { color: '#94a3b8', font: { family: 'sans-serif', size: 11 } } }
+                    },
+                    scales: {
+                        x: { grid: { color: '#334155/30' }, ticks: { color: '#94a3b8' } },
+                        y: { grid: { color: '#334155/30' }, ticks: { color: '#94a3b8' } }
+                    }
+                }
+            });
+        } else {
+            document.getElementById('reportTitle').innerText = "⚠️ ဒေတာမရှိပါ သို့မဟုတ် လင့်ခ်မှားယွင်းနေပါသည်။";
+        }
+    </script>
+</body>
+</html>
