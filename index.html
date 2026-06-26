@@ -3,69 +3,95 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>S&S7 Fashion Dashboard</title>
+    <title>S&S7 Fashion Premium Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    </style>
 </head>
-<body class="bg-slate-50 text-slate-800 font-sans antialiased pb-10">
+<body class="bg-slate-900 text-slate-100 min-h-screen antialiased pb-12 select-none">
 
-    <div class="max-w-md mx-auto px-4 pt-4">
-        <div class="bg-gradient-to-r from-violet-600 to-indigo-600 rounded-2xl p-5 shadow-xl text-white mb-5 text-center">
-            <h1 id="app-title" class="text-xl font-bold tracking-wide">📊 S&S7 FASHION</h1>
-            <p class="text-xs text-indigo-100 mt-1">Real-time Financial Analytics</p>
-        </div>
+    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-md h-72 bg-gradient-to-b from-indigo-600/20 to-transparent blur-3xl pointer-events-none"></div>
 
-        <div class="grid grid-cols-2 gap-3 mb-6">
-            <div class="bg-white border border-slate-100 rounded-xl p-4 shadow-xs text-center">
-                <span class="text-xs text-slate-400 block font-medium">💰 စုစုပေါင်းရောင်းရငွေ</span>
-                <span id="total-sell" class="text-lg font-bold text-slate-800">0 MMK</span>
+    <div class="max-w-md mx-auto px-4 pt-6 relative z-10">
+        
+        <div class="flex items-center justify-between mb-6">
+            <div>
+                <span class="text-xs font-semibold tracking-widest text-indigo-400 uppercase">FASHION OS</span>
+                <h1 id="app-title" class="text-xl font-bold tracking-tight text-white mt-0.5">S&S7 DASHBOARD</h1>
             </div>
-            <div class="bg-emerald-50 border border-emerald-100 rounded-xl p-4 shadow-xs text-center">
-                <span class="text-xs text-emerald-600 block font-medium">📈 အသားတင်အမြတ်</span>
-                <span id="total-profit" class="text-lg font-bold text-emerald-700">0 MMK</span>
+            <div class="bg-slate-800/80 border border-slate-700/50 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-medium text-slate-400 tracking-wider uppercase">
+                🟢 Live Data
             </div>
         </div>
 
-        <div class="bg-white rounded-2xl p-4 shadow-xs border border-slate-100 mb-6">
-            <h2 class="text-sm font-bold text-slate-500 mb-3 uppercase tracking-wider">📈 အရောင်းခွဲခြမ်းစိတ်ဖြာမှု ပြဂရပ်ဖ်</h2>
-            <div class="relative w-full h-48">
+        <div class="grid grid-cols-2 gap-3.5 mb-5">
+            <div class="bg-gradient-to-br from-slate-800/90 to-slate-900/90 border border-slate-800 rounded-2xl p-4.5 shadow-xl backdrop-blur-md">
+                <div class="w-7 h-7 rounded-lg bg-indigo-500/10 flex items-center justify-center mb-3">
+                    <span class="text-indigo-400 text-sm">💰</span>
+                </div>
+                <span class="text-[11px] font-medium text-slate-400 block tracking-wide">စုစုပေါင်း ရောင်းရငွေ</span>
+                <span id="total-sell" class="text-lg font-bold text-white mt-1 block tracking-tight">0 MMK</span>
+            </div>
+
+            <div class="bg-gradient-to-br from-slate-800/90 to-slate-900/90 border border-slate-800 rounded-2xl p-4.5 shadow-xl backdrop-blur-md">
+                <div class="w-7 h-7 rounded-lg bg-emerald-500/10 flex items-center justify-center mb-3">
+                    <span class="text-emerald-400 text-sm">📈</span>
+                </div>
+                <span class="text-[11px] font-medium text-slate-400 block tracking-wide">အသားတင် အမြတ်ငွေ</span>
+                <span id="total-profit" class="text-lg font-bold text-emerald-400 mt-1 block tracking-tight">0 MMK</span>
+            </div>
+        </div>
+
+        <div class="bg-slate-800/40 border border-slate-800/60 rounded-xl p-3.5 mb-6 flex items-center justify-between backdrop-blur-xs">
+            <div class="flex items-center gap-2.5">
+                <div class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></div>
+                <span class="text-xs text-slate-300">ပျမ်းမျှ အမြတ်နှုန်း (Profit Margin)</span>
+            </div>
+            <span id="profit-margin" class="text-xs font-bold bg-amber-400/10 text-amber-400 px-2.5 py-1 rounded-md">0%</span>
+        </div>
+
+        <div class="bg-slate-800/60 border border-slate-800 rounded-2xl p-5 shadow-xl mb-6 backdrop-blur-md">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-2">
+                    📊 အရောင်းပြဂရပ်ဖ် စာရင်းခွဲ
+                </h2>
+                <span class="text-[10px] text-slate-500 font-medium">Chart.js Active</span>
+            </div>
+            <div class="relative w-full h-44">
                 <canvas id="analyticsChart"></canvas>
             </div>
         </div>
 
-        <div class="bg-white rounded-2xl shadow-xs border border-slate-100 overflow-hidden">
-            <div class="px-4 py-3 bg-slate-100 border-b border-slate-200">
-                <h2 class="text-sm font-bold text-slate-600">📝 အသေးစိတ် အရောင်းစာရင်း</h2>
+        <div>
+            <div class="flex items-center justify-between mb-3 px-1">
+                <h2 class="text-xs font-semibold text-slate-400 uppercase tracking-wider">📝 အသေးစိတ် အရောင်းစာရင်း</h2>
+                <span id="item-count" class="text-[10px] font-medium bg-slate-800 px-2 py-0.5 rounded-full text-slate-400">0 Items</span>
             </div>
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="bg-slate-50 border-b border-slate-100 text-xs text-slate-400 uppercase font-semibold">
-                            <th class="py-3 px-4">ပစ္စည်း / ရက်စွဲ</th>
-                            <th class="py-3 px-4 text-center">ခုရေ</th>
-                            <th class="py-3 px-4 text-right">ရောင်းရငွေ</th>
-                            <th class="py-3 px-4 text-right text-emerald-600">အမြတ်</th>
-                        </tr>
-                    </thead>
-                    <tbody id="data-rows" class="text-sm divide-y divide-slate-100 text-slate-600">
-                        </tbody>
-                </table>
+            
+            <div id="data-cards-container" class="space-y-2.5">
+                <div class="text-center py-8 text-slate-500 text-xs tracking-wide">ဒေတာများကို ပုံဖော်နေပါသည်...</div>
             </div>
         </div>
+
     </div>
 
     <script>
-        // Initialize Telegram WebApp UI
         if (window.Telegram && window.Telegram.WebApp) {
             window.Telegram.WebApp.ready();
             window.Telegram.WebApp.expand();
+            // Match Telegram Theme if available
+            window.Telegram.WebApp.setHeaderColor('#0f172a'); 
         }
 
-        // --- 🔒 BURMESE UNICODE SAFE BASE64 DECODER ---
+        // 🛡️ ANTI-CRASH UNICODE BASE64 DECODER
         function decodeSafeUTF8(base64Str) {
             try {
-                const binaryString = atob(base64Str);
+                let cleanedB64 = decodeURIComponent(base64Str).replace(/ /g, '+');
+                const binaryString = atob(cleanedB64);
                 const bytes = new Uint8Array(binaryString.length);
                 for (let i = 0; i < binaryString.length; i++) {
                     bytes[i] = binaryString.charCodeAt(i);
@@ -77,7 +103,6 @@
             }
         }
 
-        // Get Parameters from URL
         const urlParams = new URLSearchParams(window.location.search);
         const encodedData = urlParams.get('data');
 
@@ -86,31 +111,47 @@
             if (jsonString) {
                 const webData = JSON.parse(jsonString);
 
-                // Update HTML elements
-                document.getElementById('app-title').innerText = webData.title || "စာရင်းချုပ်";
-                document.getElementById('total-sell').innerText = Number(webData.total_sell).toLocaleString() + " MMK";
-                document.getElementById('total-profit').innerText = Number(webData.total_profit).toLocaleString() + " MMK";
+                // UI Elements Mapping
+                document.getElementById('app-title').innerText = webData.title || "S&S7 FASHION";
+                
+                const sellAmt = Number(webData.total_sell);
+                const profitAmt = Number(webData.total_profit);
+                
+                document.getElementById('total-sell').innerText = sellAmt.toLocaleString() + " K";
+                document.getElementById('total-profit').innerText = profitAmt.toLocaleString() + " K";
 
-                // Generate Data Table Rows
-                const tbody = document.getElementById('data-rows');
-                tbody.innerHTML = ""; // Clear loader
+                // Calculate Profit Margin %
+                const marginPercent = sellAmt > 0 ? Math.round((profitAmt / sellAmt) * 100) : 0;
+                document.getElementById('profit-margin').innerText = "↑ " + marginPercent + "% Margin";
+
+                // Dynamic Card List rendering
+                const container = document.getElementById('data-cards-container');
+                container.innerHTML = ""; 
+                document.getElementById('item-count').innerText = `${webData.items.length} စာရင်း`;
                 
                 webData.items.forEach(item => {
-                    const row = document.createElement('tr');
-                    row.className = "hover:bg-slate-50/80 transition-colors";
+                    const card = document.createElement('div');
+                    card.className = "bg-gradient-to-r from-slate-800/70 to-slate-900/70 border border-slate-800/80 rounded-xl p-3.5 flex items-center justify-between shadow-xs transition-all active:scale-[0.99]";
                     
-                    const qtyDisplay = item.qty !== null ? `${item.qty} ထည်` : "-";
+                    const qtyDisplay = item.qty !== null ? `<span class="inline-block text-[10px] font-semibold bg-indigo-500/10 text-indigo-400 px-1.5 py-0.5 rounded mt-1">${item.qty} ထည် ရောင်းရ</span>` : `<span class="inline-block text-[10px] text-slate-500 mt-1">🗓️ စာရင်းချုပ်</span>`;
                     
-                    row.innerHTML = `
-                        <td class="py-3 px-4 font-medium text-slate-800">${item.name}</td>
-                        <td class="py-3 px-4 text-center text-slate-500">${qtyDisplay}</td>
-                        <td class="py-3 px-4 text-right font-semibold">${Number(item.sell).toLocaleString()}</td>
-                        <td class="py-3 px-4 text-right font-semibold text-emerald-600">+${Number(item.profit).toLocaleString()}</td>
+                    card.innerHTML = `
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-xl bg-slate-800 border border-slate-700/50 flex items-center justify-center text-base shadow-inner">🛍️</div>
+                            <div>
+                                <h4 class="text-sm font-semibold text-slate-200 tracking-wide">${item.name}</h4>
+                                ${qtyDisplay}
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-sm font-bold text-white block tracking-tight">${Number(item.sell).toLocaleString()} K</span>
+                            <span class="text-[11px] font-bold text-emerald-400 block mt-0.5">+${Number(item.profit).toLocaleString()} K</span>
+                        </div>
                     `;
-                    tbody.appendChild(row);
+                    container.appendChild(card);
                 });
 
-                // Generate Chart.js Analytics
+                // Chart.js Premium Styling
                 const ctx = document.getElementById('analyticsChart').getContext('2d');
                 new Chart(ctx, {
                     type: 'bar',
@@ -120,14 +161,16 @@
                             {
                                 label: 'ရောင်းရငွေ',
                                 data: webData.chart_sell,
-                                backgroundColor: 'rgba(99, 102, 241, 0.8)',
-                                borderRadius: 6
+                                backgroundColor: '#6366f1',
+                                borderRadius: window.Chart ? 5 : 4,
+                                barThickness: 14,
                             },
                             {
                                 label: 'အမြတ်',
                                 data: webData.chart_profit,
-                                backgroundColor: 'rgba(16, 185, 129, 0.8)',
-                                borderRadius: 6
+                                backgroundColor: '#10b981',
+                                borderRadius: window.Chart ? 5 : 4,
+                                barThickness: 14,
                             }
                         ]
                     },
@@ -137,11 +180,18 @@
                         plugins: { legend: { display: false } },
                         scales: {
                             y: { display: false, grid: { display: false } },
-                            x: { grid: { display: false }, ticks: { font: { size: 10 } } }
+                            x: { 
+                                grid: { display: false }, 
+                                ticks: { color: '#94a3b8', font: { size: 9, weight: '500' } } 
+                            }
                         }
                     }
                 });
+            } else {
+                document.getElementById('data-cards-container').innerHTML = `<div class="text-center py-6 text-red-400 text-xs">⚠️ ဒေတာ ဖတ်ရှုခြင်း အမှားရှိနေပါသည်။</div>`;
             }
+        } else {
+            document.getElementById('data-cards-container').innerHTML = `<div class="text-center py-6 text-amber-400 text-xs">⚠️ စနစ်ထဲတွင် ဒေတာ သယ်ဆောင်လာခြင်း မရှိပါ။</div>`;
         }
     </script>
 </body>
