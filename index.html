@@ -6,55 +6,49 @@
     <title>S&S7 Fashion Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
-<body class="bg-slate-900 text-slate-100 font-sans antialiased min-h-screen pb-10">
+<body class="bg-slate-50 text-slate-800 font-sans antialiased pb-10">
 
-    <div class="max-w-4xl mx-auto px-4 pt-6">
-        <div class="flex items-center justify-between border-b border-slate-800 pb-4 mb-6">
-            <div>
-                <h1 class="text-2xl font-bold text-indigo-400">👑 S&S7 FASHION</h1>
-                <p id="reportTitle" class="text-sm text-slate-400 mt-1">Loading Report...</p>
-            </div>
-            <span class="bg-indigo-900/50 text-indigo-300 text-xs px-3 py-1.5 rounded-full border border-indigo-500/30 font-mono">⚡ LIVE DATA</span>
+    <div class="max-w-md mx-auto px-4 pt-4">
+        <div class="bg-gradient-to-r from-violet-600 to-indigo-600 rounded-2xl p-5 shadow-xl text-white mb-5 text-center">
+            <h1 id="app-title" class="text-xl font-bold tracking-wide">📊 S&S7 FASHION</h1>
+            <p class="text-xs text-indigo-100 mt-1">Real-time Financial Analytics</p>
         </div>
 
-        <div class="grid grid-cols-3 gap-3 mb-6">
-            <div class="bg-slate-800/60 border border-slate-700/50 rounded-2xl p-4 shadow-xl">
-                <p class="text-xs text-slate-400 uppercase tracking-wider font-medium">💰 ယူဈေးရင်း</p>
-                <p id="txtCost" class="text-lg font-bold text-rose-400 mt-1">0 <span class="text-xs text-slate-500">MMK</span></p>
+        <div class="grid grid-cols-2 gap-3 mb-6">
+            <div class="bg-white border border-slate-100 rounded-xl p-4 shadow-xs text-center">
+                <span class="text-xs text-slate-400 block font-medium">💰 စုစုပေါင်းရောင်းရငွေ</span>
+                <span id="total-sell" class="text-lg font-bold text-slate-800">0 MMK</span>
             </div>
-            <div class="bg-slate-800/60 border border-slate-700/50 rounded-2xl p-4 shadow-xl">
-                <p class="text-xs text-slate-400 uppercase tracking-wider font-medium">💵 အရောင်းရငွေ</p>
-                <p id="txtRevenue" class="text-lg font-bold text-sky-400 mt-1">0 <span class="text-xs text-slate-500">MMK</span></p>
-            </div>
-            <div class="bg-slate-800/60 border border-slate-700/50 rounded-2xl p-4 shadow-xl">
-                <p class="text-xs text-slate-400 uppercase tracking-wider font-medium">📈 အသားတင်အမြတ်</p>
-                <p id="txtProfit" class="text-lg font-bold text-emerald-400 mt-1">0 <span class="text-xs text-slate-500">MMK</span></p>
+            <div class="bg-emerald-50 border border-emerald-100 rounded-xl p-4 shadow-xs text-center">
+                <span class="text-xs text-emerald-600 block font-medium">📈 အသားတင်အမြတ်</span>
+                <span id="total-profit" class="text-lg font-bold text-emerald-700">0 MMK</span>
             </div>
         </div>
 
-        <div class="bg-slate-800/40 border border-slate-700/40 rounded-2xl p-4 mb-6 shadow-xl">
-            <h3 class="text-sm font-semibold text-slate-300 mb-4 flex items-center gap-2">📊 Analytics Visualization</h3>
-            <div class="relative w-full h-64">
+        <div class="bg-white rounded-2xl p-4 shadow-xs border border-slate-100 mb-6">
+            <h2 class="text-sm font-bold text-slate-500 mb-3 uppercase tracking-wider">📈 အရောင်းခွဲခြမ်းစိတ်ဖြာမှု ပြဂရပ်ဖ်</h2>
+            <div class="relative w-full h-48">
                 <canvas id="analyticsChart"></canvas>
             </div>
         </div>
 
-        <div class="bg-slate-800/50 border border-slate-700/50 rounded-2xl shadow-xl overflow-hidden">
-            <div class="px-4 py-3 bg-slate-800/80 border-b border-slate-700/60">
-                <h3 class="text-sm font-bold text-slate-200">📝 အသေးစိတ် စာရင်းဇယားပြဇယား</h3>
+        <div class="bg-white rounded-2xl shadow-xs border border-slate-100 overflow-hidden">
+            <div class="px-4 py-3 bg-slate-100 border-b border-slate-200">
+                <h2 class="text-sm font-bold text-slate-600">📝 အသေးစိတ် အရောင်းစာရင်း</h2>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
                     <thead>
-                        <tr class="bg-slate-900/40 text-xs uppercase tracking-wider text-slate-400 border-b border-slate-700/50">
-                            <th class="py-3 px-4 font-semibold">အမည် / ရက်စွဲ</th>
-                            <th class="py-3 px-4 text-center font-semibold">အရေအတွက်</th>
-                            <th class="py-3 px-4 text-right font-semibold">အရောင်းရငွေ</th>
-                            <th class="py-3 px-4 text-right font-semibold">အမြတ်</th>
+                        <tr class="bg-slate-50 border-b border-slate-100 text-xs text-slate-400 uppercase font-semibold">
+                            <th class="py-3 px-4">ပစ္စည်း / ရက်စွဲ</th>
+                            <th class="py-3 px-4 text-center">ခုရေ</th>
+                            <th class="py-3 px-4 text-right">ရောင်းရငွေ</th>
+                            <th class="py-3 px-4 text-right text-emerald-600">အမြတ်</th>
                         </tr>
                     </thead>
-                    <tbody id="tableBody" class="text-sm divide-y divide-slate-800 text-slate-300">
+                    <tbody id="data-rows" class="text-sm divide-y divide-slate-100 text-slate-600">
                         </tbody>
                 </table>
             </div>
@@ -62,97 +56,92 @@
     </div>
 
     <script>
-        // URL မှ Data ဖတ်ပြီး Unicode (မြန်မာစာ) မပျက်အောင် Decode လုပ်သည့် စနစ်
-        function getJsonFromUrl() {
-            try {
-                const urlParams = new URLSearchParams(window.location.search);
-                const base64Str = urlParams.get('data');
-                const type = urlParams.get('type') || 'report';
-                if (!base64Str) return { type, data: null };
+        // Initialize Telegram WebApp UI
+        if (window.Telegram && window.Telegram.WebApp) {
+            window.Telegram.WebApp.ready();
+            window.Telegram.WebApp.expand();
+        }
 
+        // --- 🔒 BURMESE UNICODE SAFE BASE64 DECODER ---
+        function decodeSafeUTF8(base64Str) {
+            try {
                 const binaryString = atob(base64Str);
                 const bytes = new Uint8Array(binaryString.length);
                 for (let i = 0; i < binaryString.length; i++) {
                     bytes[i] = binaryString.charCodeAt(i);
                 }
-                const decoder = new TextDecoder('utf-8');
-                return { type, data: JSON.parse(decoder.decode(bytes)) };
+                return new TextDecoder('utf-8').decode(bytes);
             } catch (e) {
-                console.error("Decode Error", e);
-                return { type: 'error', data: null };
+                console.error("Decoding Error:", e);
+                return null;
             }
         }
 
-        const { type, data } = getJsonFromUrl();
-        const fmt = (num) => Number(num).toLocaleString();
+        // Get Parameters from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const encodedData = urlParams.get('data');
 
-        if (data) {
-            // Set Header Text
-            document.getElementById('reportTitle').innerText = data.title || "S&S7 Financial Report";
-            
-            // Set KPI Figures
-            document.getElementById('txtCost').innerHTML = `${fmt(data.total_buy)} <span class="text-xs text-slate-500">MMK</span>`;
-            document.getElementById('txtRevenue').innerHTML = `${fmt(data.total_sell)} <span class="text-xs text-slate-500">MMK</span>`;
-            document.getElementById('txtProfit').innerHTML = `${fmt(data.total_profit)} <span class="text-xs text-slate-500">MMK</span>`;
+        if (encodedData) {
+            const jsonString = decodeSafeUTF8(encodedData);
+            if (jsonString) {
+                const webData = JSON.parse(jsonString);
 
-            // Table Rows Generation
-            const tableBody = document.getElementById('tableBody');
-            let tableHtml = '';
-            
-            data.items.forEach(item => {
-                tableHtml += `
-                    <tr class="hover:bg-slate-800/30 transition-colors">
-                        <td class="py-3.5 px-4 font-medium text-slate-200">${item.name}</td>
-                        <td class="py-3.5 px-4 text-center font-mono text-indigo-300">${item.qty ? fmt(item.qty) + ' ထည်' : '-'}</td>
-                        <td class="py-3.5 px-4 text-right font-mono text-sky-400">${fmt(item.sell)}</td>
-                        <td class="py-3.5 px-4 text-right font-mono text-emerald-400">+${fmt(item.profit)}</td>
-                    </tr>
-                `;
-            });
-            tableBody.innerHTML = tableHtml;
+                // Update HTML elements
+                document.getElementById('app-title').innerText = webData.title || "စာရင်းချုပ်";
+                document.getElementById('total-sell').innerText = Number(webData.total_sell).toLocaleString() + " MMK";
+                document.getElementById('total-profit').innerText = Number(webData.total_profit).toLocaleString() + " MMK";
 
-            // Chart Rendering Logic (Chart.js)
-            const ctx = document.getElementById('analyticsChart').getContext('2d');
-            
-            new Chart(ctx, {
-                type: type === 'best' ? 'bar' : 'line',
-                data: {
-                    labels: data.chart_labels,
-                    datasets: [
-                        {
-                            label: 'အရောင်းရငွေ (Revenue)',
-                            data: data.chart_sell,
-                            backgroundColor: 'rgba(56, 189, 248, 0.2)',
-                            borderColor: '#38bdf8',
-                            borderWidth: 2,
-                            tension: 0.3,
-                            fill: type !== 'best'
-                        },
-                        {
-                            label: 'အသားတင်အမြတ် (Profit)',
-                            data: data.chart_profit,
-                            backgroundColor: 'rgba(52, 211, 153, 0.2)',
-                            borderColor: '#34d399',
-                            borderWidth: 2,
-                            tension: 0.3,
-                            fill: type !== 'best'
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { labels: { color: '#94a3b8', font: { family: 'sans-serif', size: 11 } } }
+                // Generate Data Table Rows
+                const tbody = document.getElementById('data-rows');
+                tbody.innerHTML = ""; // Clear loader
+                
+                webData.items.forEach(item => {
+                    const row = document.createElement('tr');
+                    row.className = "hover:bg-slate-50/80 transition-colors";
+                    
+                    const qtyDisplay = item.qty !== null ? `${item.qty} ထည်` : "-";
+                    
+                    row.innerHTML = `
+                        <td class="py-3 px-4 font-medium text-slate-800">${item.name}</td>
+                        <td class="py-3 px-4 text-center text-slate-500">${qtyDisplay}</td>
+                        <td class="py-3 px-4 text-right font-semibold">${Number(item.sell).toLocaleString()}</td>
+                        <td class="py-3 px-4 text-right font-semibold text-emerald-600">+${Number(item.profit).toLocaleString()}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+
+                // Generate Chart.js Analytics
+                const ctx = document.getElementById('analyticsChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: webData.chart_labels,
+                        datasets: [
+                            {
+                                label: 'ရောင်းရငွေ',
+                                data: webData.chart_sell,
+                                backgroundColor: 'rgba(99, 102, 241, 0.8)',
+                                borderRadius: 6
+                            },
+                            {
+                                label: 'အမြတ်',
+                                data: webData.chart_profit,
+                                backgroundColor: 'rgba(16, 185, 129, 0.8)',
+                                borderRadius: 6
+                            }
+                        ]
                     },
-                    scales: {
-                        x: { grid: { color: '#334155/30' }, ticks: { color: '#94a3b8' } },
-                        y: { grid: { color: '#334155/30' }, ticks: { color: '#94a3b8' } }
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: { display: false, grid: { display: false } },
+                            x: { grid: { display: false }, ticks: { font: { size: 10 } } }
+                        }
                     }
-                }
-            });
-        } else {
-            document.getElementById('reportTitle').innerText = "⚠️ ဒေတာမရှိပါ သို့မဟုတ် လင့်ခ်မှားယွင်းနေပါသည်။";
+                });
+            }
         }
     </script>
 </body>
