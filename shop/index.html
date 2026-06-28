@@ -25,6 +25,7 @@
             object-fit: contain;
             width: 100%;
             height: 100%;
+            max-height: 40vh;
         }
         .zoomed {
             transform: scale(1.8);
@@ -48,7 +49,7 @@
     <div id="root-menu-view" class="space-y-4">
         <div class="mb-4 px-1">
             <h2 class="text-xs font-black text-pink-500 uppercase tracking-widest">ပင်မကဏ္ဍများ (Categories)</h2>
-            <p class="text-xs text-slate-500 mt-1">ကြည့်ရှုလိုသော ပင်မဖက်ရှင်ကဏ္ဍတစ်ခုကို ရွေးချယ်ပေးပါရှင်.</p>
+            <p class="text-xs text-slate-500 mt-1">ကြည့်ရှုလိုသော ပင်မဖက်ရှင်ကဏ္ဍတစ်ခုကို ရွေးချယ်ပေးပါရှင်။</p>
         </div>
         <div id="root-cards-grid" class="grid grid-cols-1 gap-4">
             <p id="root-loading" class="text-center text-pink-400 font-medium my-12 text-xs animate-pulse">
@@ -98,7 +99,7 @@
                         ← Swipe Gallery →
                     </span>
                     <span class="text-white text-[9px] font-bold tracking-wider uppercase flex items-center gap-1">
-                        👆 တက်ပ် (သို့) နှစ်ချက်နှိပ်၍ Zoom ဆွဲနိုင်သည်
+                        👆 ပုံကိုနှိပ်၍ Zoom ဆွဲနိုင်သည် (Pinch/Double tap)
                     </span>
                 </div>
             </div>
@@ -230,18 +231,37 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
+        // 🎯 တိကျသေချာသော ID စစ်ထုတ်ခြင်း (Strict & Case-insensitive Matching) + Debugging Console Log
         function selectSubCategory(subId, subName) {
-            document.getElementById('current-subtitle').innerText = subName;
+            console.log("Clicked Sub-menu ID:", subId, "Name:", subName);
+            document.getElementById('current-sub-title').innerText = subName;
             const container = document.getElementById('shop-container');
             container.innerHTML = '';
 
+            // Database ထဲက ပစ္စည်းအားလုံး၏ category များကို စာလုံးအသေး/အကြီး (lowercase) ပြောင်း၍ တိုက်စစ်ခြင်း
             let filtered = allProducts.filter(p => {
                 const pCatId = p.category_id || p.category;
-                return pCatId && pCatId.toString().trim() === subId.toString().trim();
+                if (!pCatId) return false;
+                
+                const id1 = pCatId.toString().trim().toLowerCase();
+                const id2 = subId.toString().trim().toLowerCase();
+                
+                return id1 === id2;
             });
 
+            console.log("Filtered Products Count:", filtered.length);
+
             if (filtered.length === 0) {
-                container.innerHTML = `<p class="col-span-2 text-center text-slate-400 my-16 text-xs bg-white p-6 rounded-2xl border border-pink-50">ဤကဏ္ဍတွင် ပစ္စည်းများ မရှိသေးပါရှင်။</p>`;
+                // 💡 Debugging အတွက် အထောက်အကူဖြစ်စေရန် (မည်သည့် ID ဝင်နေလဲနှင့် မည်သည့် Product ID တွေနဲ့ တိုက်နေလဲ ဖော်ပြပေးမည့်စနစ်)
+                let sampleProductCategoryIds = allProducts.slice(0, 3).map(p => p.category_id || p.category);
+                container.innerHTML = `
+                    <div class="col-span-2 text-center text-slate-400 my-8 text-xs bg-white p-6 rounded-2xl border border-pink-50">
+                        <p class="font-bold text-pink-500 mb-2">⚠️ ဤကဏ္ဍခွဲ (Sub-menu) အတွင်း ချိတ်ဆက်ထားသော ပစ္စည်းများ မရှိသေးပါရှင်။</p>
+                        <p class="text-[9px] text-slate-500">Sub-menu ID (စစ်ဆေးချက်): <code class="bg-slate-100 px-1 py-0.5 rounded">${subId}</code></p>
+                        <p class="text-[9px] text-slate-500 mt-1">ဒေတာဘေ့စ်ထဲမှ နမူနာ Category ID များ: <code class="bg-slate-100 px-1 py-0.5 rounded">${JSON.stringify(sampleProductCategoryIds)}</code></p>
+                        <p class="text-[9px] text-slate-400 mt-3">အကြံပြုချက်။ ။ MongoDB (သို့) Bot မှတဆင့် အဆိုပါ Sub-menu အောက်တွင် ပစ္စည်းအသစ်များကို အမှန်တကယ် ထည့်သွင်းထားခြင်း ရှိမရှိ စစ်ဆေးပေးပါရန်</p>
+                    </div>
+                `;
             } else {
                 filtered.forEach(p => {
                     let imageUrl = 'https://placehold.co/400x500?text=S%26S7+Fashion';
@@ -273,6 +293,7 @@
                     `;
                 });
             }
+
             document.getElementById('sub-menu-view').classList.add('hidden');
             document.getElementById('product-view').classList.remove('hidden');
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -291,13 +312,13 @@
         }
 
         // 🔮 FREESTYLE FULLSCREEN PINCH-TO-ZOOM & VIDEO FREEDOM
-        function openDetailModal(productId) {
+        function DetailModal(productId) {
             const product = allProducts.find(p => p._id === productId);
             if (!product) return;
 
             document.getElementById('detail-title').innerText = product.name || 'Untitled';
             document.getElementById('detail-desc').innerText = product.description || 'အညွှန်း မရှိပါ။';
-            document.getElementById('detail-add-btn').setAttribute('onclick', `addToCartFromDetail('${product._id}', '${product.name || "Premium Item"}')`);
+            document.getElementById('detail-add-btn').setAttribute('onclick', `CartFromDetail('${product._id}', '${product.name || "Premium Item"}')`);
 
             const sliderContainer = document.getElementById('detail-media-slider');
             sliderContainer.innerHTML = '';
@@ -342,7 +363,6 @@
         // 🔍 ပုံကို Double-click (သို့) တစ်ချက်နှိပ်၍ ချဲ့ခြင်း / မူလအတိုင်းပြန်ထားခြင်း Function
         function toggleZoom(imgElement) {
             imgElement.classList.toggle('zoomed');
-            // အကယ်၍ zoom ဝင်သွားရင် ဖန်သားပြင်ဗဟိုချက်သို့ရောက်အောင် ပြုလုပ်ပေးခြင်း
             if(imgElement.classList.contains('zoomed')){
                 imgElement.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
             }
@@ -353,7 +373,7 @@
             document.getElementById('detail-media-slider').innerHTML = '';
         }
 
-        function addToCartFromDetail(id, name) {
+        function CartFromDetail(id, name) {
             addToCart(id, name);
             closeDetailModal();
             toggleCartModal(); 
