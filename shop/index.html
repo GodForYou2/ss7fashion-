@@ -51,7 +51,7 @@
     </div>
 
     <div id="detail-modal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-end justify-center transition-all duration-300">
-        <div class="bg-white w-full max-w-md rounded-t-[2.5rem] shadow-2xl max-h-[92vh] overflow-y-auto border-t border-rose-100 animate-slideUp">
+        <div class="bg-white w-full max-w-md rounded-t-[2.5rem] shadow-2xl max-h-[92vh] overflow-y-auto border-t border-rose-100 relative">
             
             <div class="absolute top-4 right-4 z-50">
                 <button onclick="closeDetailModal()" class="w-9 h-9 bg-black/40 backdrop-blur-md text-white rounded-full text-xl font-bold flex items-center justify-center active:scale-90">&times;</button>
@@ -125,22 +125,33 @@
                 const catRes = await fetch(`${API_URL}/api/products`); 
                 allProducts = await catRes.json();
 
-                // 🗓️ MongoDB _id မှ Timestamp ယူပြီး Newest First (အသစ်ဆုံး) အရင်စီခြင်း
-                allProducts.sort((a, b) => b._id.toString().substring(0,8).localeCompare(a._id.toString().substring(0,8)));
+                // 🗓️ Safe Sorting System
+                allProducts.sort((a, b) => {
+                    const idA = a._id ? a._id.toString() : '';
+                    const idB = b._id ? b._id.toString() : '';
+                    return idB.localeCompare(idA);
+                });
 
                 extractCategories();
                 renderMainCategories();
                 renderProducts();
             } catch (error) {
-                document.getElementById('loading-text').innerHTML = "❌ <span class='text-red-500'>ဆာဗာချိတ်ဆက်မှု မအောင်မြင်ပါဗျာ</span>";
+                document.getElementById('loading-text').innerHTML = "❌ <span class='text-red-500'>ဒေတာဆွဲယူမှု အဆင်မပြေပါဗျာ (Console Error စစ်ပါ)</span>";
+                console.error("Shop Init Error: ", error);
             }
         }
 
+        // 📁 Auto Database Category Extractor (ဒေတာမပျက်အောင် Safe ဖြစ်ဆုံးပုံစံပြောင်းလဲထားသည်)
         function extractCategories() {
-            let uniqueCats = [...new Set(allProducts.map(p => p.category_id))];
-            allCategories = uniqueCats.map((catId, index) => ({
-                _id: catId,
-                name: index === 0 ? "အမျိုးသားဝတ်" : "အမျိုးသမီးဝတ်", 
+            let categoriesMap = new Map();
+            allProducts.forEach(p => {
+                let catId = p.category_id || p.category || 'general';
+                let catName = p.category_name || p.category || (catId === 'general' ? 'အထွေထွေ' : catId);
+                categoriesMap.set(catId, catName);
+            });
+            allCategories = Array.from(categoriesMap.entries()).map(([id, name]) => ({
+                _id: id,
+                name: name,
                 parent_id: null 
             }));
         }
@@ -165,11 +176,14 @@
                 b.classList.add('bg-white', 'text-rose-500', 'border', 'border-rose-100/70', 'font-medium');
             });
             const activeBtn = document.getElementById(`cat-${catId}`);
-            activeBtn.classList.remove('bg-white', 'text-rose-500', 'border', 'border-rose-100/70', 'font-medium');
-            activeBtn.classList.add('pink-gradient', 'text-white', 'pink-glow', 'font-semibold');
+            if (activeBtn) {
+                activeBtn.classList.remove('bg-white', 'text-rose-500', 'border', 'border-rose-100/70', 'font-medium');
+                activeBtn.classList.add('pink-gradient', 'text-white', 'pink-glow', 'font-semibold');
+            }
             renderProducts();
         }
 
+        // 📦 Flexible Multi-Media Render (ပုံစံမျိုးစုံကို အကုန်ဖတ်ပေးနိုင်သော စနစ်)
         function renderProducts() {
             const container = document.getElementById('shop-container');
             container.innerHTML = '';
@@ -177,7 +191,7 @@
 
             let filtered = allProducts;
             if (selectedMainCatId !== 'all') {
-                filtered = filtered.filter(p => p.category_id === selectedMainCatId);
+                filtered = filtered.filter(p => (p.category_id || p.category || 'general') === selectedMainCatId);
             }
 
             if (filtered.length === 0) {
@@ -186,22 +200,34 @@
             }
 
             filtered.forEach((p, idx) => {
-                const firstColor = p.colors[0];
-                const firstMedia = firstColor?.media[0];
                 let coverHtml = '';
+                let mediaUrl = '';
+                let isVideo = false;
 
-                if (firstMedia) {
-                    const mediaUrl = `${API_URL}/api/image/${firstMedia.file_id}`;
-                    if (firstMedia.type === 'video') {
+                // ဒေတာစနစ် မျိုးစုံကို လိုက်ဖတ်ပေးခြင်း
+                if (p.colors && p.colors[0] && p.colors[0].media && p.colors[0].media[0]) {
+                    const m = p.colors[0].media[0];
+                    mediaUrl = `${API_URL}/api/image/${m.file_id}`;
+                    isVideo = m.type === 'video';
+                } else if (p.file_id) {
+                    mediaUrl = `${API_URL}/api/image/${p.file_id}`;
+                    isVideo = p.type === 'video';
+                } else if (p.image || p.image_url) {
+                    mediaUrl = p.image || p.image_url;
+                }
+
+                if (mediaUrl) {
+                    if (isVideo) {
                         coverHtml = `<video src="${mediaUrl}" class="w-full h-48 object-cover rounded-2xl bg-black pointer-events-none"></video><div class="absolute inset-0 flex items-center justify-center bg-black/20"><span class="text-white bg-black/40 px-2 py-1 rounded-lg text-[10px]">🎥 Video</span></div>`;
                     } else {
                         coverHtml = `<img src="${mediaUrl}" class="w-full h-48 object-cover rounded-2xl bg-rose-50/30">`;
                     }
+                } else {
+                    coverHtml = `<img src="https://placehold.co/300x300?text=S%26S7+Fashion" class="w-full h-48 object-cover rounded-2xl">`;
                 }
 
                 const isNewBadge = idx < 2 ? `<span class="absolute top-2.5 left-2.5 pink-gradient text-white text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">New ✨</span>` : '';
 
-                // ⚠️ နှိပ်လိုက်တာနဲ့ အသေးစိတ် Modal ပွင့်သွားအောင် 'openDetailModal' ချိတ်ဆက်ထားသည်
                 container.innerHTML += `
                     <div onclick="openDetailModal('${p._id}')" class="bg-white rounded-3xl p-3 border border-rose-100/40 shadow-xs flex flex-col justify-between relative cursor-pointer active:scale-98 transition-transform">
                         <div class="relative overflow-hidden rounded-2xl">
@@ -209,8 +235,8 @@
                             ${isNewBadge}
                         </div>
                         <div class="mt-2.5 px-1 flex-grow">
-                            <h3 class="font-bold text-xs text-slate-800 line-clamp-1">${p.name}</h3>
-                            <p class="text-[10px] text-slate-400 line-clamp-2 mt-1 leading-relaxed">${p.description}</p>
+                            <h3 class="font-bold text-xs text-slate-800 line-clamp-1">${p.name || 'No Name'}</h3>
+                            <p class="text-[10px] text-slate-400 line-clamp-2 mt-1 leading-relaxed">${p.description || ''}</p>
                         </div>
                         <div class="mt-3">
                             <span class="w-full text-center block text-[11px] text-rose-500 font-semibold py-2 bg-rose-50 rounded-xl">
@@ -222,47 +248,70 @@
             });
         }
 
-        // =======================================================
-        // 🔮 NEW: PRODUCT DETAIL MODAL LOGIC (ALL IMAGES & VIDEOS)
-        // =======================================================
+        // 🔮 LUXURY PRODUCT DETAIL MODAL LOGIC (ALL IMAGES & VIDEOS)
         function openDetailModal(productId) {
             const product = allProducts.find(p => p._id === productId);
             if (!product) return;
 
-            document.getElementById('detail-title').innerText = product.name;
-            document.getElementById('detail-desc').innerText = product.description;
+            document.getElementById('detail-title').innerText = product.name || 'No Name';
+            document.getElementById('detail-desc').innerText = product.description || 'အညွှန်းမရှိပါ။';
+            document.getElementById('detail-add-btn').setAttribute('onclick', `addToCartFromDetail('${product._id}', '${product.name || "Fashion Item"}')`);
 
-            // ခြင်းတောင်းထဲထည့်မည့် Button Function ကို လက်ရှိ ပစ္စည်း ID ပြောင်းပေးခြင်း
-            document.getElementById('detail-add-btn').setAttribute('onclick', `addToCartFromDetail('${product._id}', '${product.name}')`);
-
-            // စုဆောင်းထားသမျှ ရှိသမျှ အရောင်ခွဲတွေရဲ့ ပုံ/ဗီဒီယို အကုန်ဆွဲထုတ်ခြင်း
             const sliderContainer = document.getElementById('detail-media-slider');
             sliderContainer.innerHTML = '';
+            let hasMedia = false;
 
-            product.colors.forEach(color => {
-                color.media.forEach(media => {
-                    const mediaUrl = `${API_URL}/api/image/${media.file_id}`;
-                    let itemHtml = `<div class="w-full h-full flex-shrink-0 snap-center">`;
-                    
-                    if (media.type === 'video') {
-                        itemHtml += `<video src="${mediaUrl}" controls playsinline class="w-full h-full object-cover bg-black"></video>`;
-                    } else {
-                        itemHtml += `<img src="${mediaUrl}" class="w-full h-full object-cover bg-rose-50/20">`;
+            // ၁။ Colors array ထဲက ပုံတွေကို ရှာဖွေခြင်း
+            if (product.colors && Array.isArray(product.colors)) {
+                product.colors.forEach(color => {
+                    if (color.media && Array.isArray(color.media)) {
+                        color.media.forEach(media => {
+                            const mediaUrl = `${API_URL}/api/image/${media.file_id}`;
+                            let itemHtml = `<div class="w-full h-full flex-shrink-0 snap-center">`;
+                            if (media.type === 'video') {
+                                itemHtml += `<video src="${mediaUrl}" controls playsinline class="w-full h-full object-cover bg-black"></video>`;
+                            } else {
+                                itemHtml += `<img src="${mediaUrl}" class="w-full h-full object-cover bg-rose-50/20">`;
+                            }
+                            itemHtml += `</div>`;
+                            sliderContainer.innerHTML += itemHtml;
+                            hasMedia = true;
+                        });
                     }
-                    
-                    itemHtml += `</div>`;
-                    sliderContainer.innerHTML += itemHtml;
                 });
-            });
+            }
 
-            // Show Modal
+            // ၂။ သီးသန့် Single file_id သုံးထားလျှင် ဖတ်ပေးခြင်း
+            if (!hasMedia && product.file_id) {
+                const mediaUrl = `${API_URL}/api/image/${product.file_id}`;
+                let itemHtml = `<div class="w-full h-full flex-shrink-0 snap-center">`;
+                if (product.type === 'video') {
+                    itemHtml += `<video src="${mediaUrl}" controls playsinline class="w-full h-full object-cover bg-black"></video>`;
+                } else {
+                    itemHtml += `<img src="${mediaUrl}" class="w-full h-full object-cover bg-rose-50/20">`;
+                }
+                itemHtml += `</div>`;
+                sliderContainer.innerHTML += itemHtml;
+                hasMedia = true;
+            }
+
+            // ၃။ သီးသန့် image url သုံးထားလျှင် ဖတ်ပေးခြင်း
+            if (!hasMedia && (product.image || product.image_url)) {
+                const mediaUrl = product.image || product.image_url;
+                sliderContainer.innerHTML += `<div class="w-full h-full flex-shrink-0 snap-center"><img src="${mediaUrl}" class="w-full h-full object-cover"></div>`;
+                hasMedia = true;
+            }
+
+            if (!hasMedia) {
+                sliderContainer.innerHTML = `<div class="w-full h-full flex items-center justify-center text-slate-400 text-xs bg-slate-900">No Media Available</div>`;
+            }
+
             document.getElementById('detail-modal').classList.remove('hidden');
             if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
         }
 
         function closeDetailModal() {
             document.getElementById('detail-modal').classList.add('hidden');
-            // Modal ပိတ်ရင် ဗီဒီယိုတွေပါ ရပ်သွားအောင် slider ကို ရှင်းလိုက်သည်
             document.getElementById('detail-media-slider').innerHTML = '';
         }
 
