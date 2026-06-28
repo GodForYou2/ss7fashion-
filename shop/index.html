@@ -7,7 +7,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Pyidaungsu:wght@400;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=300;400;500;600;700;800&family=Pyidaungsu:wght=400;700&display=swap');
         body { 
             font-family: 'Plus Jakarta Sans', 'Pyidaungsu', sans-serif; 
             background: linear-gradient(180deg, #fdf2f8 0%, #f8fafc 100%);
@@ -231,14 +231,12 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // 🎯 တိကျသေချာသော ID စစ်ထုတ်ခြင်း (Strict & Case-insensitive Matching) + Debugging Console Log
         function selectSubCategory(subId, subName) {
             console.log("Clicked Sub-menu ID:", subId, "Name:", subName);
             document.getElementById('current-sub-title').innerText = subName;
             const container = document.getElementById('shop-container');
             container.innerHTML = '';
 
-            // Database ထဲက ပစ္စည်းအားလုံး၏ category များကို စာလုံးအသေး/အကြီး (lowercase) ပြောင်း၍ တိုက်စစ်ခြင်း
             let filtered = allProducts.filter(p => {
                 const pCatId = p.category_id || p.category;
                 if (!pCatId) return false;
@@ -252,7 +250,6 @@
             console.log("Filtered Products Count:", filtered.length);
 
             if (filtered.length === 0) {
-                // 💡 Debugging အတွက် အထောက်အကူဖြစ်စေရန် (မည်သည့် ID ဝင်နေလဲနှင့် မည်သည့် Product ID တွေနဲ့ တိုက်နေလဲ ဖော်ပြပေးမည့်စနစ်)
                 let sampleProductCategoryIds = allProducts.slice(0, 3).map(p => p.category_id || p.category);
                 container.innerHTML = `
                     <div class="col-span-2 text-center text-slate-400 my-8 text-xs bg-white p-6 rounded-2xl border border-pink-50">
@@ -311,8 +308,8 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // 🔮 FREESTYLE FULLSCREEN PINCH-TO-ZOOM & VIDEO FREEDOM
-        function DetailModal(productId) {
+        // 🔮 FREESTYLE FULLSCREEN PINCH-TO-ZOOM & VIDEO FREEDOM (Function Name Fixed Here)
+        function openDetailModal(productId) {
             const product = allProducts.find(p => p._id === productId);
             if (!product) return;
 
@@ -341,10 +338,8 @@
                     let slideHtml = `<div class="w-full h-full flex-shrink-0 snap-center relative flex items-center justify-center p-2">`;
                     
                     if (m.type === 'video') {
-                        // ဗီဒီယိုများကို လွတ်လပ်စွာ (Freestyle) ဖွင့်၊ ရပ်၊ ထိန်းချုပ်ကြည့်နိုင်ရန် controls ပါဝင်သောစနစ်
                         slideHtml += `<video src="${mediaUrl}" controls playsinline class="w-full h-full max-h-[40vh] object-contain rounded-2xl bg-black/50"></video>`;
                     } else {
-                        // ပုံများကို နှိပ်လျှင် Zoom ဆွဲ/Fullscreen ရနိုင်ရန် Native Zoom & Fullscreen Feature ထည့်ပေးထားခြင်း
                         slideHtml += `<img src="${mediaUrl}" onclick="toggleZoom(this)" class="zoomable-media rounded-2xl shadow-md object-contain" alt="zoomable">`;
                     }
                     slideHtml += `</div>`;
@@ -360,7 +355,6 @@
             if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
         }
 
-        // 🔍 ပုံကို Double-click (သို့) တစ်ချက်နှိပ်၍ ချဲ့ခြင်း / မူလအတိုင်းပြန်ထားခြင်း Function
         function toggleZoom(imgElement) {
             imgElement.classList.toggle('zoomed');
             if(imgElement.classList.contains('zoomed')){
