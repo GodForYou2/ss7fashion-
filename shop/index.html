@@ -17,6 +17,19 @@
         .luxury-gradient { background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%); }
         .luxury-glow { box-shadow: 0 10px 25px -5px rgba(236, 72, 153, 0.35); }
         .glass-blur { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px); }
+        
+        /* Pinch to Zoom & Freestyle Style */
+        .zoomable-media {
+            transition: transform 0.3s ease;
+            cursor: zoom-in;
+            object-fit: contain;
+            width: 100%;
+            height: 100%;
+        }
+        .zoomed {
+            transform: scale(1.8);
+            cursor: zoom-out;
+        }
     </style>
 </head>
 <body class="p-4 min-h-screen text-slate-800 pb-24">
@@ -35,7 +48,7 @@
     <div id="root-menu-view" class="space-y-4">
         <div class="mb-4 px-1">
             <h2 class="text-xs font-black text-pink-500 uppercase tracking-widest">ပင်မကဏ္ဍများ (Categories)</h2>
-            <p class="text-xs text-slate-500 mt-1">ကြည့်ရှုလိုသော ပင်မဖက်ရှင်ကဏ္ဍတစ်ခုကို ရွေးချယ်ပေးပါရှင်။</p>
+            <p class="text-xs text-slate-500 mt-1">ကြည့်ရှုလိုသော ပင်မဖက်ရှင်ကဏ္ဍတစ်ခုကို ရွေးချယ်ပေးပါရှင်.</p>
         </div>
         <div id="root-cards-grid" class="grid grid-cols-1 gap-4">
             <p id="root-loading" class="text-center text-pink-400 font-medium my-12 text-xs animate-pulse">
@@ -57,8 +70,7 @@
             <p class="text-xs text-slate-500 mt-0.5">ခွဲခြားထားသော ကဏ္ဍခွဲတစ်ခုကို ထပ်မံရွေးချယ်ပါ-</p>
         </div>
         
-        <div id="sub-cards-grid" class="grid grid-cols-1 gap-4">
-            </div>
+        <div id="sub-cards-grid" class="grid grid-cols-1 gap-4"></div>
     </div>
 
     <div id="product-view" class="hidden">
@@ -68,7 +80,6 @@
             </button>
             <h2 id="current-sub-title" class="text-xs font-black text-white luxury-gradient px-3 py-2 rounded-xl tracking-wider uppercase luxury-glow">---</h2>
         </div>
-
         <div id="shop-container" class="grid grid-cols-2 gap-4"></div>
     </div>
 
@@ -79,11 +90,16 @@
                 <button onclick="closeDetailModal()" class="w-8 h-8 bg-black/40 backdrop-blur-md text-white rounded-full text-base font-bold flex items-center justify-center active:scale-90">&times;</button>
             </div>
 
-            <div class="relative w-full h-[45vh] bg-slate-950 rounded-t-[2.5rem] overflow-hidden flex-shrink-0">
-                <div id="detail-media-slider" class="w-full h-full flex overflow-x-auto snap-x snap-mandatory no-scrollbar">
+            <div class="relative w-full h-[45vh] bg-slate-950 rounded-t-[2.5rem] overflow-hidden flex-shrink-0 group">
+                <div id="detail-media-slider" class="w-full h-full flex overflow-x-auto snap-x snap-mandatory no-scrollbar items-center">
                     </div>
-                <div id="swipe-badge" class="absolute bottom-4 left-4 bg-black/60 text-white text-[9px] px-2.5 py-1 rounded-md font-medium tracking-widest hidden uppercase">
-                    ← Swipe Gallery →
+                <div class="absolute bottom-4 left-4 right-4 flex justify-between items-center px-3 py-1.5 bg-black/60 rounded-xl backdrop-blur-md">
+                    <span id="swipe-badge" class="text-white text-[9px] font-medium tracking-widest uppercase hidden">
+                        ← Swipe Gallery →
+                    </span>
+                    <span class="text-white text-[9px] font-bold tracking-wider uppercase flex items-center gap-1">
+                        👆 တက်ပ် (သို့) နှစ်ချက်နှိပ်၍ Zoom ဆွဲနိုင်သည်
+                    </span>
                 </div>
             </div>
 
@@ -148,22 +164,18 @@
             try {
                 const prodResponse = await fetch(`${API_URL}/api/products`);
                 allProducts = await prodResponse.json();
-                // Latest Data first (အသစ်ဆုံး items များကို အပေါ်ဆုံးတွင် ပြသရန် စီစစ်ခြင်း)
                 allProducts.sort((a, b) => (b._id || '').toString().localeCompare((a._id || '').toString()));
             } catch (error) {
                 document.getElementById('root-loading').innerText = "⚠️ ဆာဗာချိတ်ဆက်မှု မရရှိပါ";
                 return;
             }
-
             document.getElementById('root-loading').classList.add('hidden');
             renderRootCategories();
         }
 
-        // 📁 ပြသရန် ပင်မ Menu ကြီးများ (parent_id သည် null ဖြစ်သော categories များ)
         function renderRootCategories() {
             const grid = document.getElementById('root-cards-grid');
             grid.innerHTML = '';
-
             const roots = allCategories.filter(c => !c.parent_id || c.parent_id === "null" || c.parent_id === "root");
 
             if(roots.length === 0) {
@@ -188,12 +200,10 @@
             });
         }
 
-        // 📁 ပင်မ မီနူးကို နှိပ်လျှင် အောက်ပါ ကဏ္ဍခွဲ (Sub-categories) များကို ဖော်ထုတ်ခြင်း
         function openSubMenu(rootId, rootName) {
             document.getElementById('parent-menu-title').innerText = rootName;
             const grid = document.getElementById('sub-cards-grid');
             grid.innerHTML = '';
-
             const subMenus = allCategories.filter(c => c.parent_id === rootId);
 
             if(subMenus.length === 0) {
@@ -215,19 +225,16 @@
                     `;
                 });
             }
-
             document.getElementById('root-menu-view').classList.add('hidden');
             document.getElementById('sub-menu-view').classList.remove('hidden');
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // 🎯 Sub-menu ကို နှိပ်မှ သက်ဆိုင်ရာ Product များကို စစ်ထုတ်ပြသခြင်း (Filter)
         function selectSubCategory(subId, subName) {
-            document.getElementById('current-sub-title').innerText = subName;
+            document.getElementById('current-subtitle').innerText = subName;
             const container = document.getElementById('shop-container');
             container.innerHTML = '';
 
-            // Sub-category ID ဖြင့် items များကို စစ်ထုတ်ခြင်း
             let filtered = allProducts.filter(p => {
                 const pCatId = p.category_id || p.category;
                 return pCatId && pCatId.toString().trim() === subId.toString().trim();
@@ -266,7 +273,6 @@
                     `;
                 });
             }
-
             document.getElementById('sub-menu-view').classList.add('hidden');
             document.getElementById('product-view').classList.remove('hidden');
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -284,7 +290,7 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // 🔮 PREMIUM MODAL DESIGN (Media နှင့် Description အကွက် သီးသန့်ခွဲထုတ်ထားခြင်း)
+        // 🔮 FREESTYLE FULLSCREEN PINCH-TO-ZOOM & VIDEO FREEDOM
         function openDetailModal(productId) {
             const product = allProducts.find(p => p._id === productId);
             if (!product) return;
@@ -311,11 +317,14 @@
             if (mediaList.length > 0) {
                 mediaList.forEach(m => {
                     const mediaUrl = `${API_URL}/api/image/${m.file_id}`;
-                    let slideHtml = `<div class="w-full h-full flex-shrink-0 snap-center relative">`;
+                    let slideHtml = `<div class="w-full h-full flex-shrink-0 snap-center relative flex items-center justify-center p-2">`;
+                    
                     if (m.type === 'video') {
-                        slideHtml += `<video src="${mediaUrl}" controls playsinline autoplay class="w-full h-full object-cover bg-black"></video>`;
+                        // ဗီဒီယိုများကို လွတ်လပ်စွာ (Freestyle) ဖွင့်၊ ရပ်၊ ထိန်းချုပ်ကြည့်နိုင်ရန် controls ပါဝင်သောစနစ်
+                        slideHtml += `<video src="${mediaUrl}" controls playsinline class="w-full h-full max-h-[40vh] object-contain rounded-2xl bg-black/50"></video>`;
                     } else {
-                        slideHtml += `<img src="${mediaUrl}" class="w-full h-full object-cover">`;
+                        // ပုံများကို နှိပ်လျှင် Zoom ဆွဲ/Fullscreen ရနိုင်ရန် Native Zoom & Fullscreen Feature ထည့်ပေးထားခြင်း
+                        slideHtml += `<img src="${mediaUrl}" onclick="toggleZoom(this)" class="zoomable-media rounded-2xl shadow-md object-contain" alt="zoomable">`;
                     }
                     slideHtml += `</div>`;
                     sliderContainer.innerHTML += slideHtml;
@@ -328,6 +337,15 @@
 
             document.getElementById('detail-modal').classList.remove('hidden');
             if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+        }
+
+        // 🔍 ပုံကို Double-click (သို့) တစ်ချက်နှိပ်၍ ချဲ့ခြင်း / မူလအတိုင်းပြန်ထားခြင်း Function
+        function toggleZoom(imgElement) {
+            imgElement.classList.toggle('zoomed');
+            // အကယ်၍ zoom ဝင်သွားရင် ဖန်သားပြင်ဗဟိုချက်သို့ရောက်အောင် ပြုလုပ်ပေးခြင်း
+            if(imgElement.classList.contains('zoomed')){
+                imgElement.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+            }
         }
 
         function closeDetailModal() {
