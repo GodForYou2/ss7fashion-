@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <title>S&S7 Fashion - High Luxury Pink Hub</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -18,18 +18,25 @@
         .luxury-glow { box-shadow: 0 10px 25px -5px rgba(236, 72, 153, 0.35); }
         .glass-blur { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px); }
         
-        /* Pinch to Zoom & Freestyle Style */
+        /* Native-like Zoom Wrapper */
+        .zoom-container {
+            overflow: visible;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            touch-action: none; /* Browser ရဲ့ default scroll ကိုပိတ်ပြီး လက်နှစ်ချောင်းဆွဲတာပဲ လက်ခံမယ် */
+        }
         .zoomable-media {
-            transition: transform 0.3s ease;
-            cursor: zoom-in;
+            user-select: none;
+            -webkit-user-drag: none;
+            max-height: 40vh;
             object-fit: contain;
             width: 100%;
             height: 100%;
-            max-height: 40vh;
-        }
-        .zoomed {
-            transform: scale(1.8);
-            cursor: zoom-out;
+            will-change: transform;
+            transition: transform 0.1s ease-out; /* ပွတ်ဆွဲရတာ ချောမွေ့စေရန် */
         }
     </style>
 </head>
@@ -99,7 +106,7 @@
                         ← Swipe Gallery →
                     </span>
                     <span class="text-white text-[9px] font-bold tracking-wider uppercase flex items-center gap-1">
-                        👆 ပုံကိုနှိပ်၍ Zoom ဆွဲနိုင်သည် (Pinch/Double tap)
+                        👆 လက်နှစ်ချောင်းဖြင့် ပုံကို ချဲ့/ချုံ့ ကြည့်နိုင်ပါသည် (Pinch to Zoom)
                     </span>
                 </div>
             </div>
@@ -232,7 +239,6 @@
         }
 
         function selectSubCategory(subId, subName) {
-            console.log("Clicked Sub-menu ID:", subId, "Name:", subName);
             document.getElementById('current-sub-title').innerText = subName;
             const container = document.getElementById('shop-container');
             container.innerHTML = '';
@@ -246,8 +252,6 @@
                 
                 return id1 === id2;
             });
-
-            console.log("Filtered Products Count:", filtered.length);
 
             if (filtered.length === 0) {
                 let sampleProductCategoryIds = allProducts.slice(0, 3).map(p => p.category_id || p.category);
@@ -308,7 +312,7 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // 🔮 FREESTYLE FULLSCREEN PINCH-TO-ZOOM & VIDEO FREEDOM (Function Name Fixed Here)
+        // 🔮 PREMIUM PINCH TO ZOOM LOGIC FOR SMARTPHONES
         function openDetailModal(productId) {
             const product = allProducts.find(p => p._id === productId);
             if (!product) return;
@@ -333,18 +337,33 @@
             }
 
             if (mediaList.length > 0) {
-                mediaList.forEach(m => {
+                mediaList.forEach((m, idx) => {
                     const mediaUrl = `${API_URL}/api/image/${m.file_id}`;
                     let slideHtml = `<div class="w-full h-full flex-shrink-0 snap-center relative flex items-center justify-center p-2">`;
                     
                     if (m.type === 'video') {
                         slideHtml += `<video src="${mediaUrl}" controls playsinline class="w-full h-full max-h-[40vh] object-contain rounded-2xl bg-black/50"></video>`;
                     } else {
-                        slideHtml += `<img src="${mediaUrl}" onclick="toggleZoom(this)" class="zoomable-media rounded-2xl shadow-md object-contain" alt="zoomable">`;
+                        // Pinch container Wrapper
+                        slideHtml += `
+                            <div class="zoom-container" id="zoom-wrap-${idx}">
+                                <img src="${mediaUrl}" class="zoomable-media rounded-2xl shadow-md" alt="fashion-item">
+                            </div>
+                        `;
                     }
                     slideHtml += `</div>`;
                     sliderContainer.innerHTML += slideHtml;
                 });
+                
+                // Pinch Touch Events များ စတင်ထည့်သွင်းခြင်း
+                setTimeout(() => {
+                    mediaList.forEach((m, idx) => {
+                        if(m.type !== 'video') {
+                            initPinchToZoom(document.getElementById(`zoom-wrap-${idx}`));
+                        }
+                    });
+                }, 50);
+
                 document.getElementById('swipe-badge').classList.toggle('hidden', mediaList.length <= 1);
             } else {
                 sliderContainer.innerHTML = `<div class="w-full h-full flex items-center justify-center text-slate-400 text-xs bg-slate-900">No Image</div>`;
@@ -355,11 +374,59 @@
             if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
         }
 
-        function toggleZoom(imgElement) {
-            imgElement.classList.toggle('zoomed');
-            if(imgElement.classList.contains('zoomed')){
-                imgElement.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
-            }
+        // 📱 လက်နှစ်ချောင်းသုံး Pinch-to-Zoom စနစ်သီးသန့် ကုဒ်တွက်ချက်မှုအပိုင်း
+        function initPinchToZoom(container) {
+            if (!container) return;
+            const img = container.querySelector('.zoomable-media');
+            const slider = document.getElementById('detail-media-slider');
+            if (!img) return;
+
+            let scale = 1;
+            let startDist = 0;
+            let initialScale = 1;
+
+            container.addEventListener('touchstart', (e) => {
+                if (e.touches.length === 2) {
+                    // လက်နှစ်ချောင်းအကြား အကွာအဝေးကို စတင်မှတ်သားခြင်း
+                    startDist = Math.hypot(
+                        e.touches[0].pageX - e.touches[1].pageX,
+                        e.touches[0].pageY - e.touches[1].pageY
+                    );
+                    initialScale = scale;
+                    // ပုံကိုချဲ့နေစဉ် Gallery slide လှည့်မသွားအောင် ခေတ္တပိတ်ထားခြင်း
+                    slider.style.overflowX = 'hidden'; 
+                }
+            });
+
+            container.addEventListener('touchmove', (e) => {
+                if (e.touches.length === 2 && startDist > 0) {
+                    const currentDist = Math.hypot(
+                        e.touches[0].pageX - e.touches[1].pageX,
+                        e.touches[0].pageY - e.touches[1].pageY
+                    );
+                    
+                    // Scale အသစ်တွက်ချက်ခြင်း
+                    scale = (currentDist / startDist) * initialScale;
+                    
+                    // အနိမ့်ဆုံး မူလအရွယ်အစား (1) နှင့် အမြင့်ဆုံး (4) ဆအထိပဲ ချဲ့ခွင့်ပြုမည်
+                    if (scale < 1) scale = 1;
+                    if (scale > 4) scale = 4;
+
+                    img.style.transform = `scale(${scale})`;
+                }
+            });
+
+            container.addEventListener('touchend', (e) => {
+                if (e.touches.length < 2) {
+                    startDist = 0;
+                    // လက်ပြန်လွှတ်လိုက်လို့ မူလအရွယ်အစားနီးပါးဖြစ်သွားရင် 1 အတိုင်း ပြန်ဖြစ်သွားစေရန်
+                    if (scale <= 1.1) {
+                        scale = 1;
+                        img.style.transform = `scale(1)`;
+                        slider.style.overflowX = 'auto'; // Gallery slide ကို ပြန်ဖွင့်ပေးခြင်း
+                    }
+                }
+            });
         }
 
         function closeDetailModal() {
