@@ -3,223 +3,393 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>S&S7 Fashion Premium Dashboard</title>
-    <!-- Tailwind CSS v4 -->
+    <title>S&S7 Fashion - Premium Pink Store</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Telegram WebApp SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Pyidaungsu:wght@400;700&display=swap');
+        body { 
+            font-family: 'Plus Jakarta Sans', 'Pyidaungsu', sans-serif; 
+            background: linear-gradient(180deg, #fff1f2 0%, #fffbfa 100%);
+        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .pink-gradient { background: linear-gradient(135deg, #ff8da1 0%, #f43f5e 100%); }
+        .pink-glow { box-shadow: 0 10px 25px -5px rgba(244, 63, 94, 0.2); }
+        .glass-card { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(10px); }
     </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen antialiased pb-12 select-none">
+<body class="p-4 min-h-screen text-slate-800 pb-24">
 
-    <!-- Premium Glow Background Effect -->
-    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-md h-72 bg-gradient-to-b from-indigo-600/20 to-transparent blur-3xl pointer-events-none"></div>
+    <div class="w-full bg-rose-500 text-white text-[10px] py-1 px-4 rounded-full text-center font-medium mb-4 tracking-wider animate-pulse">
+        ✨ NEW ARRIVALS: အသစ်စက်စက် ဖက်ရှင်များကို ဦးဦးဖျားဖျား ဝယ်ယူလိုက်ပါ ✨
+    </div>
 
-    <div class="max-w-md mx-auto px-4 pt-6 relative z-10">
-        
-        <!-- Header Section -->
-        <div class="flex items-center justify-between mb-6">
-            <div>
-                <span class="text-xs font-semibold tracking-widest text-indigo-400 uppercase">FASHION OS</span>
-                <h1 id="app-title" class="text-xl font-bold tracking-tight text-white mt-0.5">S&S7 DASHBOARD</h1>
-            </div>
-            <div class="bg-slate-800/80 border border-slate-700/50 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-medium text-slate-400 tracking-wider uppercase">
-                🟢 Live Data
-            </div>
-        </div>
-
-        <!-- Main Analytics Cards Grid -->
-        <div class="grid grid-cols-2 gap-3.5 mb-5">
-            <!-- Total Sales Card -->
-            <div class="bg-gradient-to-br from-slate-800/90 to-slate-900/90 border border-slate-800 rounded-2xl p-4.5 shadow-xl backdrop-blur-md">
-                <div class="w-7 h-7 rounded-lg bg-indigo-500/10 flex items-center justify-center mb-3">
-                    <span class="text-indigo-400 text-sm">💰</span>
-                </div>
-                <span class="text-[11px] font-medium text-slate-400 block tracking-wide">စုစုပေါင်း ရောင်းရငွေ</span>
-                <span id="total-sell" class="text-lg font-bold text-white mt-1 block tracking-tight">0 MMK</span>
-            </div>
-
-            <!-- Total Profit Card -->
-            <div class="bg-gradient-to-br from-slate-800/90 to-slate-900/90 border border-slate-800 rounded-2xl p-4.5 shadow-xl backdrop-blur-md">
-                <div class="w-7 h-7 rounded-lg bg-emerald-500/10 flex items-center justify-center mb-3">
-                    <span class="text-emerald-400 text-sm">📈</span>
-                </div>
-                <span class="text-[11px] font-medium text-slate-400 block tracking-wide">အသားတင် အမြတ်ငွေ</span>
-                <span id="total-profit" class="text-lg font-bold text-emerald-400 mt-1 block tracking-tight">0 MMK</span>
-            </div>
-        </div>
-
-        <!-- Advanced Analytics Badge (ROI/Margin) -->
-        <div class="bg-slate-800/40 border border-slate-800/60 rounded-xl p-3.5 mb-6 flex items-center justify-between backdrop-blur-xs">
-            <div class="flex items-center gap-2.5">
-                <div class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></div>
-                <span class="text-xs text-slate-300">ပျမ်းမျှ အမြတ်နှုန်း (Profit Margin)</span>
-            </div>
-            <span id="profit-margin" class="text-xs font-bold bg-amber-400/10 text-amber-400 px-2.5 py-1 rounded-md">0%</span>
-        </div>
-
-        <!-- Chart Section with Glassmorphism (Upgraded to Clean Line Chart) -->
-        <div class="bg-slate-800/60 border border-slate-800 rounded-2xl p-5 shadow-xl mb-6 backdrop-blur-md">
-            <div class="flex items-center justify-between mb-3">
-                <h2 class="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-2">
-                    📊 အရောင်းနှင့် အမြတ် ပြဂရပ်ဖ်
-                </h2>
-                <div class="flex items-center gap-3 text-[10px]">
-                    <div class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-indigo-500"></span> <span class="text-slate-400">ရောင်းရငွေ</span></div>
-                    <div class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> <span class="text-slate-400">အမြတ်</span></div>
-                </div>
-            </div>
-            <div class="relative w-full h-48">
-                <canvas id="analyticsChart"></canvas>
-            </div>
-        </div>
-
-        <!-- Premium List Section (Explicit Labels Format) -->
+    <div class="flex justify-between items-center glass-card p-4 rounded-3xl shadow-xs border border-rose-100/50 mb-5">
         <div>
-            <div class="flex items-center justify-between mb-3 px-1">
-                <h2 class="text-xs font-semibold text-slate-400 uppercase tracking-wider">📝 ရက်စွဲအလိုက် စာရင်းချုပ်များ</h2>
-                <span id="item-count" class="text-[10px] font-medium bg-slate-800 px-2 py-0.5 rounded-full text-slate-400">0 ရက်</span>
-            </div>
+            <h1 class="text-2xl font-extrabold tracking-tight bg-gradient-to-r from-rose-500 to-pink-600 bg-clip-text text-transparent">
+                S&S7 Fashion
+            </h1>
+            <p id="user-greeting" class="text-xs text-rose-400 font-medium mt-0.5">မင်္ဂလာပါ သခင်လေး 🙏</p>
+        </div>
+        <div class="relative bg-rose-50 hover:bg-rose-100 p-3.5 rounded-2xl cursor-pointer transition-all active:scale-90" onclick="toggleCartModal()">
+            <span class="text-xl">🛍️</span>
+            <span id="cart-count" class="absolute -top-1.5 -right-1.5 pink-gradient text-white text-[10px] w-5 h-5 rounded-full flex items-center justify-center font-bold border-2 border-white shadow-xs">0</span>
+        </div>
+    </div>
+
+    <div id="main-category-menu" class="flex gap-2.5 overflow-x-auto no-scrollbar pb-3">
+        <button onclick="filterMainCategory('all')" id="cat-all" class="pink-gradient text-white px-5 py-2.5 rounded-2xl text-xs font-semibold whitespace-nowrap pink-glow">
+            ✨ အားလုံးကြည့်မည်
+        </button>
+    </div>
+
+    <div id="shop-container" class="grid grid-cols-2 gap-4">
+        <p id="loading-text" class="col-span-2 text-center text-rose-400 font-medium my-12 text-sm">
+            🌸 ချစ်စရာ ပစ္စည်းလေးများကို ဆွဲယူနေပါသည်...
+        </p>
+    </div>
+
+    <div id="detail-modal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-end justify-center transition-all duration-300">
+        <div class="bg-white w-full max-w-md rounded-t-[2.5rem] shadow-2xl max-h-[92vh] overflow-y-auto border-t border-rose-100 relative">
             
-            <!-- Dynamic Cards Container -->
-            <div id="data-cards-container" class="space-y-2.5">
-                <!-- Loader -->
-                <div class="text-center py-8 text-slate-500 text-xs tracking-wide">ဒေတာများကို ပုံဖော်နေပါသည်...</div>
+            <div class="absolute top-4 right-4 z-50">
+                <button onclick="closeDetailModal()" class="w-9 h-9 bg-black/40 backdrop-blur-md text-white rounded-full text-xl font-bold flex items-center justify-center active:scale-90">&times;</button>
+            </div>
+
+            <div class="relative w-full h-[45vh] bg-slate-900">
+                <div id="detail-media-slider" class="w-full h-full flex overflow-x-auto snap-x snap-mandatory no-scrollbar">
+                    </div>
+                <div class="absolute bottom-3 right-4 bg-black/50 text-white text-[10px] px-2.5 py-1 rounded-full font-medium tracking-wide">
+                    👈 Swipe ဘယ်ညာဆွဲကြည့်ရန်
+                </div>
+            </div>
+
+            <div class="p-6 bg-white rounded-t-[2.5rem] -mt-6 relative z-10">
+                <div class="w-12 h-1 bg-slate-200 rounded-full mx-auto mb-4"></div>
+                
+                <h2 id="detail-title" class="text-xl font-extrabold text-slate-800 leading-snug">Product Name</h2>
+                <span class="inline-block mt-2 bg-rose-50 text-rose-500 font-bold text-[10px] uppercase tracking-wider px-2.5 py-1 rounded-lg">In-Stock ✨</span>
+                
+                <div class="mt-5">
+                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider">အသေးစိတ်အညွှန်း (Description)</h4>
+                    <p id="detail-desc" class="text-sm text-slate-600 mt-2 leading-relaxed whitespace-pre-line bg-rose-50/30 p-4 rounded-2xl border border-rose-100/30">
+                        Product Description goes here...
+                    </p>
+                </div>
+
+                <div class="mt-6">
+                    <button id="detail-add-btn" class="w-full pink-gradient text-white py-4 rounded-2xl font-bold shadow-lg pink-glow hover:opacity-95 active:scale-95 transition-all text-sm tracking-wide">
+                        💖 ခြင်းတောင်းထဲထည့်မည်
+                    </button>
+                </div>
             </div>
         </div>
+    </div>
 
+    <div id="cart-modal" class="hidden fixed inset-0 bg-black/40 z-50 flex items-end justify-center">
+        <div class="bg-white/95 backdrop-blur-md w-full max-w-md rounded-t-[2.5rem] p-6 shadow-2xl max-h-[85vh] overflow-y-auto border-t border-rose-100">
+            <div class="flex justify-between items-center mb-5 border-b border-rose-50 pb-3">
+                <div class="flex items-center gap-2">
+                    <span class="text-xl">🛒</span>
+                    <h2 class="text-lg font-bold text-slate-800">ခြင်းတောင်းထဲက စာရင်း</h2>
+                </div>
+                <button onclick="toggleCartModal()" class="w-8 h-8 bg-rose-50 text-rose-500 rounded-full text-lg font-bold flex items-center justify-center active:scale-90">&times;</button>
+            </div>
+            <div id="cart-items" class="space-y-3 max-h-[40vh] overflow-y-auto pr-1 no-scrollbar"></div>
+            <div class="border-t border-rose-50 mt-5 pt-5">
+                <button onclick="checkoutOrder()" class="w-full pink-gradient text-white py-4 rounded-2xl font-bold shadow-lg pink-glow hover:opacity-95 active:scale-95 transition-all text-sm tracking-wide">
+                    💖 အော်ဒါအတည်ပြုမည်
+                </button>
+            </div>
+        </div>
     </div>
 
     <script>
-        if (window.Telegram && window.Telegram.WebApp) {
-            window.Telegram.WebApp.ready();
-            window.Telegram.WebApp.expand();
-            window.Telegram.WebApp.setHeaderColor('#0f172a'); 
+        const API_URL = "https://myshop-1833.onrender.com"; 
+
+        // =======================================================
+        // 🛠️ CATEGORY MAP - ID များကို မြန်မာလို အမည်ပြောင်းလဲရန်နေရာ
+        // =======================================================
+        // သင့် ဖုန်းမျက်နှာပြင်မှာ ပေါ်နေတဲ့ ID နံပါတ်တွေကို အောက်ကပုံစံအတိုင်း စိတ်ကြိုက် ပြောင်းရေးနိုင်ပါတယ်ဗျာ။
+        const CATEGORY_MAP = {
+            "men": "အမျိုးသားဝတ် 👨",
+            "women": "အမျိုးသမီးဝတ် 👩",
+            "1": "အမျိုးသားဝတ် 👨",
+            "2": "အမျိုးသမီးဝတ် 👩",
+            "general": "အထွေထွေ 🌸"
+        };
+        
+        let allProducts = [];
+        let allCategories = [];
+        let selectedMainCatId = 'all';
+        let cart = [];
+        
+        let tg = window.Telegram.WebApp;
+        tg.ready(); tg.expand();
+
+        if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+            document.getElementById('user-greeting').innerText = `မင်္ဂလာပါ ${tg.initDataUnsafe.user.first_name} ✨`;
         }
 
-        // 🛡️ ANTI-CRASH UNICODE BASE64 DECODER
-        function decodeSafeUTF8(base64Str) {
+        async function initShop() {
             try {
-                let cleanedB64 = decodeURIComponent(base64Str).replace(/ /g, '+');
-                const binaryString = atob(cleanedB64);
-                const bytes = new Uint8Array(binaryString.length);
-                for (let i = 0; i < binaryString.length; i++) {
-                    bytes[i] = binaryString.charCodeAt(i);
-                }
-                return new TextDecoder('utf-8').decode(bytes);
-            } catch (e) {
-                console.error("Decoding Error:", e);
-                return null;
+                const catRes = await fetch(`${API_URL}/api/products`); 
+                allProducts = await catRes.json();
+
+                allProducts.sort((a, b) => {
+                    const idA = a._id ? a._id.toString() : '';
+                    const idB = b._id ? b._id.toString() : '';
+                    return idB.localeCompare(idA);
+                });
+
+                extractCategories();
+                renderMainCategories();
+                renderProducts();
+            } catch (error) {
+                document.getElementById('loading-text').innerHTML = "❌ <span class='text-red-500'>ဒေတာဆွဲယူမှု အဆင်မပြေပါဗျာ။</span>";
+                console.error("Shop Init Error: ", error);
             }
         }
 
-        const urlParams = new URLSearchParams(window.location.search);
-        const encodedData = urlParams.get('data');
-
-        if (encodedData) {
-            const jsonString = decodeSafeUTF8(encodedData);
-            if (jsonString) {
-                const webData = JSON.parse(jsonString);
-
-                // UI Elements Mapping
-                document.getElementById('app-title').innerText = webData.title || "S&S7 FASHION";
+        // 📁 Auto Database Category Extractor with Smart Mapping
+        function extractCategories() {
+            let categoriesMap = new Map();
+            allProducts.forEach(p => {
+                let catId = p.category_id || p.category || 'general';
+                let catIdStr = catId.toString().trim();
                 
-                const sellAmt = Number(webData.total_sell);
-                const profitAmt = Number(webData.total_profit);
+                // CATEGORY_MAP ထဲမှာ ရှာမယ်၊ မတွေ့ရင် Database ထဲက နာမည်ရှာမယ်၊ နောက်ဆုံးမှ ID တိုလေး ပြမယ်
+                let catName = CATEGORY_MAP[catIdStr] || 
+                              CATEGORY_MAP[catIdStr.toLowerCase()] || 
+                              p.category_name || 
+                              p.category || 
+                              `ကဏ္ဍ (${catIdStr.substring(0, 6)})`;
                 
-                document.getElementById('total-sell').innerText = sellAmt.toLocaleString() + " K";
-                document.getElementById('total-profit').innerText = profitAmt.toLocaleString() + " K";
+                categoriesMap.set(catId, catName);
+            });
+            allCategories = Array.from(categoriesMap.entries()).map(([id, name]) => ({
+                _id: id,
+                name: name,
+                parent_id: null 
+            }));
+        }
 
-                const marginPercent = sellAmt > 0 ? Math.round((profitAmt / sellAmt) * 100) : 0;
-                document.getElementById('profit-margin').innerText = "↑ " + marginPercent + "% Margin";
+        function renderMainCategories() {
+            const menuContainer = document.getElementById('main-category-menu');
+            menuContainer.innerHTML = `<button onclick="filterMainCategory('all')" id="cat-all" class="pink-gradient text-white px-5 py-2.5 rounded-2xl text-xs font-semibold whitespace-nowrap pink-glow">✨ အားလုံးကြည့်မည်</button>`;
+            
+            allCategories.forEach(cat => {
+                menuContainer.innerHTML += `
+                    <button onclick="filterMainCategory('${cat._id}')" id="cat-${cat._id}" class="bg-white text-rose-500 border border-rose-100/70 px-5 py-2.5 rounded-2xl text-xs font-medium whitespace-nowrap shadow-xs">
+                        ${cat.name}
+                    </button>
+                `;
+            });
+        }
 
-                // Dynamic Card List rendering (Upgraded Formats)
-                const container = document.getElementById('data-cards-container');
-                container.innerHTML = ""; 
-                document.getElementById('item-count').innerText = `${webData.items.length} ရက်စာရင်း`;
-                
-                webData.items.forEach(item => {
-                    const card = document.createElement('div');
-                    card.className = "bg-gradient-to-r from-slate-800/80 to-slate-900/80 border border-slate-800/80 rounded-xl p-4 flex items-center justify-between shadow-xs transition-all active:scale-[0.99]";
-                    
-                    card.innerHTML = `
-                        <div class="flex items-center gap-3">
-                            <div class="w-9 h-9 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-base shadow-inner">📅</div>
-                            <div>
-                                <h4 class="text-sm font-bold text-white tracking-wide">${item.name} စာရင်းချုပ်</h4>
-                                <span class="text-[11px] text-slate-400 block mt-0.5">ရောင်းရငွေ နှင့် အမြတ်ငွေ</span>
-                            </div>
+        function filterMainCategory(catId) {
+            selectedMainCatId = catId;
+            document.querySelectorAll('#main-category-menu button').forEach(b => {
+                b.classList.remove('pink-gradient', 'text-white', 'pink-glow', 'font-semibold');
+                b.classList.add('bg-white', 'text-rose-500', 'border', 'border-rose-100/70', 'font-medium');
+            });
+            const activeBtn = document.getElementById(`cat-${catId}`);
+            if (activeBtn) {
+                activeBtn.classList.remove('bg-white', 'text-rose-500', 'border', 'border-rose-100/70', 'font-medium');
+                activeBtn.classList.add('pink-gradient', 'text-white', 'pink-glow', 'font-semibold');
+            }
+            renderProducts();
+        }
+
+        function renderProducts() {
+            const container = document.getElementById('shop-container');
+            container.innerHTML = '';
+            document.getElementById('loading-text').classList.add('hidden');
+
+            let filtered = allProducts;
+            if (selectedMainCatId !== 'all') {
+                filtered = filtered.filter(p => (p.category_id || p.category || 'general').toString() === selectedMainCatId.toString());
+            }
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<div class="col-span-2 text-center py-12"><p class="text-xs text-rose-400 font-medium">🌸 ပစ္စည်းမရှိသေးပါဗျာ။</p></div>`;
+                return;
+            }
+
+            filtered.forEach((p, idx) => {
+                let coverHtml = '';
+                let mediaUrl = '';
+                let isVideo = false;
+
+                if (p.colors && p.colors[0] && p.colors[0].media && p.colors[0].media[0]) {
+                    const m = p.colors[0].media[0];
+                    mediaUrl = `${API_URL}/api/image/${m.file_id}`;
+                    isVideo = m.type === 'video';
+                } else if (p.file_id) {
+                    mediaUrl = `${API_URL}/api/image/${p.file_id}`;
+                    isVideo = p.type === 'video';
+                } else if (p.image || p.image_url) {
+                    mediaUrl = p.image || p.image_url;
+                }
+
+                if (mediaUrl) {
+                    if (isVideo) {
+                        coverHtml = `<video src="${mediaUrl}" class="w-full h-48 object-cover rounded-2xl bg-black pointer-events-none"></video><div class="absolute inset-0 flex items-center justify-center bg-black/20"><span class="text-white bg-black/40 px-2 py-1 rounded-lg text-[10px]">🎥 Video</span></div>`;
+                    } else {
+                        coverHtml = `<img src="${mediaUrl}" class="w-full h-48 object-cover rounded-2xl bg-rose-50/30">`;
+                    }
+                } else {
+                    coverHtml = `<img src="https://placehold.co/300x300?text=S%26S7+Fashion" class="w-full h-48 object-cover rounded-2xl">`;
+                }
+
+                const isNewBadge = idx < 2 ? `<span class="absolute top-2.5 left-2.5 pink-gradient text-white text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">New ✨</span>` : '';
+
+                container.innerHTML += `
+                    <div onclick="openDetailModal('${p._id}')" class="bg-white rounded-3xl p-3 border border-rose-100/40 shadow-xs flex flex-col justify-between relative cursor-pointer active:scale-98 transition-transform">
+                        <div class="relative overflow-hidden rounded-2xl">
+                            ${coverHtml}
+                            ${isNewBadge}
                         </div>
-                        <div class="text-right space-y-1">
-                            <div class="text-xs font-medium text-slate-400">
-                                အရောင်း: <span class="text-sm font-bold text-white tracking-tight">${Number(item.sell).toLocaleString()} K</span>
-                            </div>
-                            <div class="text-xs font-medium text-slate-400">
-                                အမြတ်: <span class="text-sm font-bold text-emerald-400 tracking-tight">${Number(item.profit).toLocaleString()} K</span>
-                            </div>
+                        <div class="mt-2.5 px-1 flex-grow">
+                            <h3 class="font-bold text-xs text-slate-800 line-clamp-1">${p.name || 'No Name'}</h3>
+                            <p class="text-[10px] text-slate-400 line-clamp-2 mt-1 leading-relaxed">${p.description || ''}</p>
                         </div>
-                    `;
-                    container.appendChild(card);
-                });
+                        <div class="mt-3">
+                            <span class="w-full text-center block text-[11px] text-rose-500 font-semibold py-2 bg-rose-50 rounded-xl">
+                                👀 အသေးစိတ်ကြည့်မည်
+                            </span>
+                        </div>
+                    </div>
+                `;
+            });
+        }
 
-                // 📈 UPGRADED: CLEAN & EASY LINE CHART CONFIG
-                const ctx = document.getElementById('analyticsChart').getContext('2d');
-                new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: webData.chart_labels,
-                        datasets: [
-                            {
-                                label: 'ရောင်းရငွေ',
-                                data: webData.chart_sell,
-                                borderColor: '#6366f1',
-                                backgroundColor: 'rgba(99, 102, 241, 0.05)',
-                                fill: true,
-                                tension: 0.35,
-                                borderWidth: 2.5,
-                                pointRadius: 2,
-                                pointHoverRadius: 5
-                            },
-                            {
-                                label: 'အမြတ်ငွေ',
-                                data: webData.chart_profit,
-                                borderColor: '#10b981',
-                                backgroundColor: 'rgba(16, 185, 129, 0.05)',
-                                fill: true,
-                                tension: 0.35,
-                                borderWidth: 2.5,
-                                pointRadius: 2,
-                                pointHoverRadius: 5
+        function openDetailModal(productId) {
+            const product = allProducts.find(p => p._id === productId);
+            if (!product) return;
+
+            document.getElementById('detail-title').innerText = product.name || 'No Name';
+            document.getElementById('detail-desc').innerText = product.description || 'အညွှန်းမရှိပါ။';
+            document.getElementById('detail-add-btn').setAttribute('onclick', `addToCartFromDetail('${product._id}', '${product.name || "Fashion Item"}')`);
+
+            const sliderContainer = document.getElementById('detail-media-slider');
+            sliderContainer.innerHTML = '';
+            let hasMedia = false;
+
+            if (product.colors && Array.isArray(product.colors)) {
+                product.colors.forEach(color => {
+                    if (color.media && Array.isArray(color.media)) {
+                        color.media.forEach(media => {
+                            const mediaUrl = `${API_URL}/api/image/${media.file_id}`;
+                            let itemHtml = `<div class="w-full h-full flex-shrink-0 snap-center">`;
+                            if (media.type === 'video') {
+                                itemHtml += `<video src="${mediaUrl}" controls playsinline class="w-full h-full object-cover bg-black"></video>`;
+                            } else {
+                                itemHtml += `<img src="${mediaUrl}" class="w-full h-full object-cover bg-rose-50/20">`;
                             }
-                        ]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { legend: { display: false } },
-                        scales: {
-                            y: { 
-                                grid: { color: 'rgba(148, 163, 184, 0.05)' },
-                                ticks: { color: '#64748b', font: { size: 9 } } 
-                            },
-                            x: { 
-                                grid: { display: false }, 
-                                ticks: { color: '#94a3b8', font: { size: 10, weight: '500' } } 
-                            }
-                        }
+                            itemHtml += `</div>`;
+                            sliderContainer.innerHTML += itemHtml;
+                            hasMedia = true;
+                        });
                     }
                 });
-            } else {
-                document.getElementById('data-cards-container').innerHTML = `<div class="text-center py-6 text-red-400 text-xs">⚠️ ဒေတာ ဖတ်ရှုခြင်း အမှားရှိနေပါသည်။</div>`;
             }
-        } else {
-            document.getElementById('data-cards-container').innerHTML = `<div class="text-center py-6 text-amber-400 text-xs">⚠️ စနစ်ထဲတွင် ဒေတာ သယ်ဆောင်လာခြင်း မရှိပါ။</div>`;
+
+            if (!hasMedia && product.file_id) {
+                const mediaUrl = `${API_URL}/api/image/${product.file_id}`;
+                let itemHtml = `<div class="w-full h-full flex-shrink-0 snap-center">`;
+                if (product.type === 'video') {
+                    itemHtml += `<video src="${mediaUrl}" controls playsinline class="w-full h-full object-cover bg-black"></video>`;
+                } else {
+                    itemHtml += `<img src="${mediaUrl}" class="w-full h-full object-cover bg-rose-50/20"> gradients`;
+                }
+                itemHtml += `</div>`;
+                sliderContainer.innerHTML += itemHtml;
+                hasMedia = true;
+            }
+
+            if (!hasMedia && (product.image || product.image_url)) {
+                const mediaUrl = product.image || product.image_url;
+                sliderContainer.innerHTML += `<div class="w-full h-full flex-shrink-0 snap-center"><img src="${mediaUrl}" class="w-full h-full object-cover"></div>`;
+                hasMedia = true;
+            }
+
+            if (!hasMedia) {
+                sliderContainer.innerHTML = `<div class="w-full h-full flex items-center justify-center text-slate-400 text-xs bg-slate-900">No Media Available</div>`;
+            }
+
+            document.getElementById('detail-modal').classList.remove('hidden');
+            if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
         }
+
+        function closeDetailModal() {
+            document.getElementById('detail-modal').classList.add('hidden');
+            document.getElementById('detail-media-slider').innerHTML = '';
+        }
+
+        function addToCartFromDetail(id, name) {
+            addToCart(id, name);
+            closeDetailModal();
+        }
+
+        function addToCart(id, name) {
+            let item = cart.find(x => x.id === id);
+            if (item) { item.qty++; } else { cart.push({ id, name, qty: 1 }); }
+            updateCartUI();
+            if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
+        }
+
+        function updateCartUI() {
+            document.getElementById('cart-count').innerText = cart.reduce((sum, item) => sum + item.qty, 0);
+            const cartItemsContainer = document.getElementById('cart-items');
+            cartItemsContainer.innerHTML = '';
+            
+            if (cart.length === 0) {
+                cartItemsContainer.innerHTML = `<p class="text-center text-xs text-slate-400 py-6">ခြင်းတောင်းထဲမှာ ပစ္စည်းမရှိသေးပါရှင် 🌸</p>`;
+                return;
+            }
+
+            cart.forEach(item => {
+                cartItemsContainer.innerHTML += `
+                    <div class="flex justify-between items-center bg-rose-50/50 p-3.5 rounded-2xl border border-rose-100/30">
+                        <div class="flex items-center gap-2">
+                            <span class="text-rose-400">👚</span>
+                            <p class="font-bold text-xs text-slate-700">${item.name}</p>
+                        </div>
+                        <span class="bg-rose-500 text-white px-2.5 py-0.5 rounded-lg text-[10px] font-bold">x ${item.qty}</span>
+                    </div>
+                `;
+            });
+        }
+
+        function toggleCartModal() {
+            document.getElementById('cart-modal').classList.toggle('hidden');
+        }
+
+        async function checkoutOrder() {
+            if (cart.length === 0) return alert("ခြင်းတောင်းထဲတွင် ပစ္စည်းမရှိသေးပါဗျာ။");
+            let userId = tg.initDataUnsafe?.user?.id || 12345678;
+
+            const orderPayload = { user_id: parseInt(userId), items: cart };
+
+            try {
+                const response = await fetch(`${API_URL}/api/orders`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(orderPayload)
+                });
+                const result = await response.json();
+                if (result.status === "success") {
+                    alert("🎉 အော်ဒါတင်တာ အောင်မြင်ပါတယ်ရှင်! လူကြီးမင်းကို ကျေးဇူးအထူးတင်ရှိပါတယ်။");
+                    cart = []; updateCartUI(); toggleCartModal(); tg.close();
+                }
+            } catch (error) {
+                alert("❌ အော်ဒါတင်မရပါ၊ ဆာဗာချက်ဆက်မှု စစ်ဆေးပေးပါ။");
+            }
+        }
+
+        initShop();
     </script>
 </body>
 </html>
