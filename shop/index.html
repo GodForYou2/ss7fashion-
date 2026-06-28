@@ -107,6 +107,18 @@
 
     <script>
         const API_URL = "https://myshop-1833.onrender.com"; 
+
+        // =======================================================
+        // 🛠️ CATEGORY MAP - ID များကို မြန်မာလို အမည်ပြောင်းလဲရန်နေရာ
+        // =======================================================
+        // သင့် ဖုန်းမျက်နှာပြင်မှာ ပေါ်နေတဲ့ ID နံပါတ်တွေကို အောက်ကပုံစံအတိုင်း စိတ်ကြိုက် ပြောင်းရေးနိုင်ပါတယ်ဗျာ။
+        const CATEGORY_MAP = {
+            "men": "အမျိုးသားဝတ် 👨",
+            "women": "အမျိုးသမီးဝတ် 👩",
+            "1": "အမျိုးသားဝတ် 👨",
+            "2": "အမျိုးသမီးဝတ် 👩",
+            "general": "အထွေထွေ 🌸"
+        };
         
         let allProducts = [];
         let allCategories = [];
@@ -125,7 +137,6 @@
                 const catRes = await fetch(`${API_URL}/api/products`); 
                 allProducts = await catRes.json();
 
-                // 🗓️ Safe Sorting System
                 allProducts.sort((a, b) => {
                     const idA = a._id ? a._id.toString() : '';
                     const idB = b._id ? b._id.toString() : '';
@@ -136,17 +147,25 @@
                 renderMainCategories();
                 renderProducts();
             } catch (error) {
-                document.getElementById('loading-text').innerHTML = "❌ <span class='text-red-500'>ဒေတာဆွဲယူမှု အဆင်မပြေပါဗျာ (Console Error စစ်ပါ)</span>";
+                document.getElementById('loading-text').innerHTML = "❌ <span class='text-red-500'>ဒေတာဆွဲယူမှု အဆင်မပြေပါဗျာ။</span>";
                 console.error("Shop Init Error: ", error);
             }
         }
 
-        // 📁 Auto Database Category Extractor (ဒေတာမပျက်အောင် Safe ဖြစ်ဆုံးပုံစံပြောင်းလဲထားသည်)
+        // 📁 Auto Database Category Extractor with Smart Mapping
         function extractCategories() {
             let categoriesMap = new Map();
             allProducts.forEach(p => {
                 let catId = p.category_id || p.category || 'general';
-                let catName = p.category_name || p.category || (catId === 'general' ? 'အထွေထွေ' : catId);
+                let catIdStr = catId.toString().trim();
+                
+                // CATEGORY_MAP ထဲမှာ ရှာမယ်၊ မတွေ့ရင် Database ထဲက နာမည်ရှာမယ်၊ နောက်ဆုံးမှ ID တိုလေး ပြမယ်
+                let catName = CATEGORY_MAP[catIdStr] || 
+                              CATEGORY_MAP[catIdStr.toLowerCase()] || 
+                              p.category_name || 
+                              p.category || 
+                              `ကဏ္ဍ (${catIdStr.substring(0, 6)})`;
+                
                 categoriesMap.set(catId, catName);
             });
             allCategories = Array.from(categoriesMap.entries()).map(([id, name]) => ({
@@ -183,7 +202,6 @@
             renderProducts();
         }
 
-        // 📦 Flexible Multi-Media Render (ပုံစံမျိုးစုံကို အကုန်ဖတ်ပေးနိုင်သော စနစ်)
         function renderProducts() {
             const container = document.getElementById('shop-container');
             container.innerHTML = '';
@@ -191,7 +209,7 @@
 
             let filtered = allProducts;
             if (selectedMainCatId !== 'all') {
-                filtered = filtered.filter(p => (p.category_id || p.category || 'general') === selectedMainCatId);
+                filtered = filtered.filter(p => (p.category_id || p.category || 'general').toString() === selectedMainCatId.toString());
             }
 
             if (filtered.length === 0) {
@@ -204,7 +222,6 @@
                 let mediaUrl = '';
                 let isVideo = false;
 
-                // ဒေတာစနစ် မျိုးစုံကို လိုက်ဖတ်ပေးခြင်း
                 if (p.colors && p.colors[0] && p.colors[0].media && p.colors[0].media[0]) {
                     const m = p.colors[0].media[0];
                     mediaUrl = `${API_URL}/api/image/${m.file_id}`;
@@ -248,7 +265,6 @@
             });
         }
 
-        // 🔮 LUXURY PRODUCT DETAIL MODAL LOGIC (ALL IMAGES & VIDEOS)
         function openDetailModal(productId) {
             const product = allProducts.find(p => p._id === productId);
             if (!product) return;
@@ -261,7 +277,6 @@
             sliderContainer.innerHTML = '';
             let hasMedia = false;
 
-            // ၁။ Colors array ထဲက ပုံတွေကို ရှာဖွေခြင်း
             if (product.colors && Array.isArray(product.colors)) {
                 product.colors.forEach(color => {
                     if (color.media && Array.isArray(color.media)) {
@@ -281,21 +296,19 @@
                 });
             }
 
-            // ၂။ သီးသန့် Single file_id သုံးထားလျှင် ဖတ်ပေးခြင်း
             if (!hasMedia && product.file_id) {
                 const mediaUrl = `${API_URL}/api/image/${product.file_id}`;
                 let itemHtml = `<div class="w-full h-full flex-shrink-0 snap-center">`;
                 if (product.type === 'video') {
                     itemHtml += `<video src="${mediaUrl}" controls playsinline class="w-full h-full object-cover bg-black"></video>`;
                 } else {
-                    itemHtml += `<img src="${mediaUrl}" class="w-full h-full object-cover bg-rose-50/20">`;
+                    itemHtml += `<img src="${mediaUrl}" class="w-full h-full object-cover bg-rose-50/20"> gradients`;
                 }
                 itemHtml += `</div>`;
                 sliderContainer.innerHTML += itemHtml;
                 hasMedia = true;
             }
 
-            // ၃။ သီးသန့် image url သုံးထားလျှင် ဖတ်ပေးခြင်း
             if (!hasMedia && (product.image || product.image_url)) {
                 const mediaUrl = product.image || product.image_url;
                 sliderContainer.innerHTML += `<div class="w-full h-full flex-shrink-0 snap-center"><img src="${mediaUrl}" class="w-full h-full object-cover"></div>`;
@@ -372,7 +385,7 @@
                     cart = []; updateCartUI(); toggleCartModal(); tg.close();
                 }
             } catch (error) {
-                alert("❌ အော်ဒါတင်မရပါ၊ ဆာဗာချိတ်ဆက်မှု စစ်ဆေးပေးပါ။");
+                alert("❌ အော်ဒါတင်မရပါ၊ ဆာဗာချက်ဆက်မှု စစ်ဆေးပေးပါ။");
             }
         }
 
