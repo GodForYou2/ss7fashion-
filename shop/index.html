@@ -3,111 +3,118 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>S&S7 Fashion - Visual Showroom</title>
+    <title>S&S7 Fashion - High Fashion Hub</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Pyidaungsu:wght@400;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Pyidaungsu:wght@400;700&display=swap');
         body { 
             font-family: 'Plus Jakarta Sans', 'Pyidaungsu', sans-serif; 
-            background: linear-gradient(180deg, #fdf2f8 0%, #f8fafc 100%);
+            background: #fafafa;
         }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        .luxury-gradient { background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%); }
-        .luxury-glow { box-shadow: 0 10px 25px -5px rgba(236, 72, 153, 0.3); }
-        .glass-header { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(15px); }
+        .premium-dark { background: #111111; }
+        .glass-blur { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(20px); }
     </style>
 </head>
-<body class="p-4 min-h-screen text-slate-800 pb-24">
+<body class="p-4 min-h-screen text-neutral-900 pb-24 selection:bg-neutral-200">
 
-    <div class="flex justify-between items-center glass-header p-4 rounded-3xl border border-pink-100/50 mb-5 shadow-xs">
+    <div class="flex justify-between items-center glass-blur p-4 rounded-2xl border border-neutral-100 mb-6 sticky top-0 z-40 shadow-xs">
         <div>
-            <h1 class="text-2xl font-black tracking-tight bg-gradient-to-r from-pink-500 to-violet-600 bg-clip-text text-transparent">
-                S&S7 Fashion
-            </h1>
-            <p id="user-greeting" class="text-xs text-pink-500 font-bold mt-0.5">မင်္ဂလာပါ သခင်လေး 🙏</p>
+            <h1 class="text-xl font-black tracking-widest text-neutral-900 uppercase">S&S7 FASHION</h1>
+            <p id="user-greeting" class="text-[10px] text-neutral-400 font-medium tracking-wide mt-0.5">COLLECTION 2026</p>
         </div>
-        <div class="relative bg-pink-50/80 hover:bg-pink-100 p-3.5 rounded-2xl cursor-pointer transition-all active:scale-90" onclick="toggleCartModal()">
-            <span class="text-xl">🛍️</span>
-            <span id="cart-count" class="absolute -top-1.5 -right-1.5 luxury-gradient text-white text-[10px] w-5 h-5 rounded-full flex items-center justify-center font-bold border-2 border-white shadow-xs">0</span>
+        <div class="relative bg-neutral-900 text-white p-3 rounded-xl cursor-pointer active:scale-95 transition-all" onclick="toggleCartModal()">
+            <span class="text-sm font-bold">🛒 ခြင်းတောင်း</span>
+            <span id="cart-count" class="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-bold">0</span>
         </div>
     </div>
 
-    <div id="main-category-menu" class="flex gap-2 overflow-x-auto no-scrollbar pb-3">
-        <button onclick="filterMainCategory('all')" id="cat-all" class="luxury-gradient text-white px-5 py-2.5 rounded-2xl text-xs font-semibold whitespace-nowrap luxury-glow">
-            ✨ အားလုံးကြည့်မည်
-        </button>
+    <div id="landing-view" class="space-y-4">
+        <div class="mb-4 px-1">
+            <h2 class="text-sm font-bold text-neutral-400 uppercase tracking-widest">ပင်မကဏ္ဍများ (Categories)</h2>
+            <p class="text-xs text-neutral-500 mt-1">ကြည့်ရှုလိုသော ဖက်ရှင်ကဏ္ဍတစ်ခုကို ရွေးချယ်ပေးပါရှင်။</p>
+        </div>
+        
+        <div id="category-cards-grid" class="grid grid-cols-1 gap-3.5">
+            <p id="category-loading" class="text-center text-neutral-400 font-medium my-12 text-xs animate-pulse">
+                🌸 မီနူးများကို ဖတ်ရှုနေပါသည်...
+            </p>
+        </div>
     </div>
 
-    <div id="shop-container" class="grid grid-cols-2 gap-4">
-        <p id="loading-text" class="col-span-2 text-center text-pink-400 font-medium my-16 text-sm animate-pulse">
-            🌸 ဖက်ရှင်များကို ဆွဲယူနေပါသည်...
-        </p>
+    <div id="product-view" class="hidden">
+        <div class="flex items-center justify-between mb-5 px-1">
+            <button onclick="backToMainMenu()" class="flex items-center gap-1.5 text-xs font-bold text-neutral-500 bg-neutral-100 px-3 py-2 rounded-xl active:scale-95 transition-all">
+                ← ပင်မမီနူးသို့
+            </button>
+            <h2 id="current-category-title" class="text-sm font-black text-neutral-900 tracking-wider uppercase bg-neutral-900 text-white px-3 py-1.5 rounded-xl">---</h2>
+        </div>
+
+        <div id="shop-container" class="grid grid-cols-2 gap-3.5"></div>
     </div>
 
-    <div id="detail-modal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-end justify-center transition-all duration-300">
-        <div class="bg-white w-full max-w-md rounded-t-[2.5rem] shadow-2xl max-h-[88vh] overflow-y-auto relative border-t border-pink-50">
+
+    <div id="detail-modal" class="hidden fixed inset-0 bg-black/70 z-50 flex items-end justify-center transition-all duration-300">
+        <div class="bg-white w-full max-w-md rounded-t-[2rem] shadow-2xl max-h-[92vh] overflow-y-auto relative border-t border-neutral-100 flex flex-col">
             
             <div class="absolute top-4 right-4 z-50">
-                <button onclick="closeDetailModal()" class="w-9 h-9 bg-black/40 backdrop-blur-md text-white rounded-full text-xl font-bold flex items-center justify-center active:scale-90">&times;</button>
+                <button onclick="closeDetailModal()" class="w-8 h-8 bg-white text-black shadow-lg rounded-full text-base font-bold flex items-center justify-center active:scale-90">&times;</button>
             </div>
 
-            <div class="relative w-full h-[40vh] bg-slate-900">
+            <div class="relative w-full h-[50vh] bg-neutral-900">
                 <div id="detail-media-slider" class="w-full h-full flex overflow-x-auto snap-x snap-mandatory no-scrollbar">
                     </div>
-                <div id="swipe-badge" class="absolute bottom-3 right-4 bg-black/50 text-white text-[10px] px-2.5 py-1 rounded-full font-medium tracking-wide hidden">
-                    👈 Swipe ဘယ်ညာဆွဲကြည့်ရန်
+                <div id="swipe-badge" class="absolute bottom-4 left-4 bg-black/60 text-white text-[9px] px-2.5 py-1 rounded-md font-medium tracking-widest hidden uppercase">
+                    ← Swipe Gallery →
                 </div>
             </div>
 
-            <div class="p-6 bg-white rounded-t-[2.5rem] -mt-6 relative z-10">
-                <div class="w-12 h-1 bg-slate-200 rounded-full mx-auto mb-4"></div>
-                
-                <div class="flex justify-between items-start gap-2">
-                    <h2 id="detail-title" class="text-lg font-black text-slate-800 leading-snug">Product Name</h2>
-                    <span class="inline-block bg-pink-50 text-pink-600 font-bold text-[10px] tracking-wider px-2.5 py-1 rounded-lg">Premium ✨</span>
-                </div>
-                
-                <div class="mt-4">
-                    <h4 class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">အသေးစိတ်အချက်အလက် (Description)</h4>
-                    <p id="detail-desc" class="text-xs text-slate-600 mt-2 leading-relaxed whitespace-pre-line bg-pink-50/20 p-4 rounded-2xl border border-pink-100/30">
-                        Description...
-                    </p>
+            <div class="p-6 bg-white relative z-10 -mt-4 rounded-t-2xl flex-1 flex flex-col justify-between">
+                <div>
+                    <span class="text-[9px] font-bold uppercase tracking-widest text-neutral-400 bg-neutral-50 border border-neutral-200/60 px-2 py-0.5 rounded-sm">Premium Cut</span>
+                    <h2 id="detail-title" class="text-xl font-extrabold text-neutral-900 tracking-tight leading-snug mt-2">Product Title</h2>
+                    
+                    <div class="mt-4 border-t border-neutral-100 pt-4">
+                        <p id="detail-desc" class="text-xs text-neutral-600 leading-relaxed whitespace-pre-line tracking-wide font-normal">
+                            Product Description text...
+                        </p>
+                    </div>
                 </div>
 
-                <div class="mt-5">
-                    <button id="detail-add-btn" class="w-full luxury-gradient text-white py-3.5 rounded-2xl font-bold shadow-lg luxury-glow active:scale-95 transition-all text-xs tracking-wider">
-                        💖 ခြင်းတောင်းထဲထည့်မည်
+                <div class="mt-6 pt-4 border-t border-neutral-100">
+                    <button id="detail-add-btn" class="w-full premium-dark text-white py-4 rounded-xl font-bold tracking-widest hover:opacity-90 active:scale-98 transition-all text-xs uppercase">
+                        🖤 ခြင်းတောင်းထဲထည့်မည်
                     </button>
                 </div>
             </div>
         </div>
     </div>
 
-    <div id="cart-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-end justify-center">
-        <div class="bg-white w-full max-w-md rounded-t-[2.5rem] p-6 shadow-2xl max-h-[80vh] overflow-y-auto">
-            <div class="flex justify-between items-center mb-4 border-b border-pink-50 pb-3">
-                <h2 class="text-base font-bold text-slate-800 flex items-center gap-2">🛍️ သင်ရွေးချယ်ထားသော အထည်များ</h2>
-                <button onclick="toggleCartModal()" class="text-slate-400 text-2xl font-bold active:scale-90">&times;</button>
+    <div id="cart-modal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-end justify-center">
+        <div class="bg-white w-full max-w-md rounded-t-[2rem] p-6 shadow-2xl max-h-[80vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-5 border-b border-neutral-100 pb-3">
+                <h2 class="text-xs font-black tracking-wider uppercase text-neutral-800 flex items-center gap-2">🛍️ ရွေးချယ်ထားသော အထည်များ</h2>
+                <button onclick="toggleCartModal()" class="text-neutral-400 text-2xl font-bold active:scale-90">&times;</button>
             </div>
             
-            <div id="cart-items" class="space-y-3 max-h-[50vh] overflow-y-auto pr-1 no-scrollbar"></div>
+            <div id="cart-items" class="space-y-3 max-h-[48vh] overflow-y-auto pr-1 no-scrollbar"></div>
             
-            <div class="border-t border-pink-50 mt-5 pt-4">
-                <button onclick="toggleCartModal()" class="w-full luxury-gradient text-white py-3.5 rounded-2xl font-bold shadow-lg luxury-glow active:scale-95 transition-all text-xs">
-                    ✨ ပစ္စည်း ဆက်လက်ကြည့်ရှုမည်
+            <div class="border-t border-neutral-100 mt-5 pt-4">
+                <button onclick="toggleCartModal()" class="w-full premium-dark text-white py-3.5 rounded-xl font-bold active:scale-95 transition-all text-xs uppercase tracking-widest">
+                    ✨ ပစ္စည်း ထပ်မံကြည့်ရှုမည်
                 </button>
             </div>
         </div>
     </div>
 
     <script>
+        // 🔗 ⚠️ ဆာဗာလင့်ခ် ထည့်ရန်နေရာ
         const API_URL = "https://myshop-1833.onrender.com"; 
         
         let allProducts = [];
         let mainCategories = [];
-        let selectedMainCat = 'all';
         let cart = [];
         
         let tg = window.Telegram.WebApp;
@@ -117,6 +124,7 @@
             document.getElementById('user-greeting').innerText = `မင်္ဂလာပါ ${tg.initDataUnsafe.user.first_name} ✨`;
         }
 
+        // 🚀 Anti-Freeze Data Fetcher
         async function loadShopData() {
             try {
                 const catResponse = await fetch(`${API_URL}/api/categories`);
@@ -128,97 +136,109 @@
                 allProducts = await prodResponse.json();
                 allProducts.sort((a, b) => (b._id || '').toString().localeCompare((a._id || '').toString()));
             } catch (error) {
-                document.getElementById('loading-text').innerText = "⚠️ API သို့မဟုတ် ဆာဗာလင့်ခ်ကို စစ်ဆေးပေးပါ";
+                document.getElementById('category-loading').innerText = "⚠️ ဆာဗာနှင့် ချိတ်ဆက်၍မရပါ";
                 return;
             }
 
-            document.getElementById('loading-text').classList.add('hidden');
-            renderMainCategories();
-            renderProducts();
+            renderLandingCategories();
         }
 
-        function renderMainCategories() {
-            const menuContainer = document.getElementById('main-category-menu');
-            menuContainer.innerHTML = `<button onclick="filterMainCategory('all')" id="cat-all" class="luxury-gradient text-white px-5 py-2.5 rounded-2xl text-xs font-semibold whitespace-nowrap luxury-glow">✨ အားလုံးကြည့်မည်</button>`;
-            
-            if(mainCategories.length > 0) {
-                mainCategories.forEach(cat => {
-                    const catName = cat.name || cat.title || "ကဏ္ဍ";
-                    menuContainer.innerHTML += `
-                        <button onclick="filterMainCategory('${cat._id}')" id="cat-${cat._id}" class="bg-white text-slate-600 border border-pink-100 px-5 py-2.5 rounded-2xl text-xs font-medium whitespace-nowrap shadow-xs transition-all">
-                            ${catName}
-                        </button>
-                    `;
-                });
-            }
-        }
+        // 📁 MongoDB ပင်မ Menu ကြီးများကို ဇိမ်ခံဒီဇိုင်း ကတ်ပြားကြီးများဖြင့် အရင်ပြသခြင်း
+        function renderLandingCategories() {
+            const grid = document.getElementById('category-cards-grid');
+            grid.innerHTML = '';
 
-        function filterMainCategory(catId) {
-            selectedMainCat = catId;
-            document.querySelectorAll('#main-category-menu button').forEach(b => {
-                b.className = "bg-white text-slate-600 border border-pink-100 px-5 py-2.5 rounded-2xl text-xs font-medium whitespace-nowrap shadow-xs transition-all";
-            });
-            const activeBtn = document.getElementById(`cat-${catId}`);
-            if (activeBtn) activeBtn.className = "luxury-gradient text-white px-5 py-2.5 rounded-2xl text-xs font-semibold whitespace-nowrap luxury-glow transition-all";
-            renderProducts();
-        }
-
-        function renderProducts() {
-            const container = document.getElementById('shop-container');
-            container.innerHTML = '';
-
-            let filtered = allProducts;
-            if (selectedMainCat !== 'all') {
-                filtered = filtered.filter(p => {
-                    const pCatId = p.category_id || p.category;
-                    return pCatId && pCatId.toString().trim() === selectedMainCat.toString().trim();
-                });
-            }
-
-            if (filtered.length === 0) {
-                container.innerHTML = `<p class="col-span-2 text-center text-slate-400 my-16 text-xs">🌸 ပစ္စည်းများ မရှိသေးပါဗျာ။</p>`;
+            if(mainCategories.length === 0) {
+                grid.innerHTML = `<p class="text-center text-neutral-400 text-xs py-8">ကဏ္ဍများ မရှိသေးပါဗျာ။</p>`;
                 return;
             }
 
-            filtered.forEach(p => {
-                let imageUrl = 'https://placehold.co/300x300?text=S%26S7+Fashion';
-                let isVideo = false;
-
-                if (p.colors?.[0]?.media?.[0]?.file_id) {
-                    const m = p.colors[0].media[0];
-                    imageUrl = `${API_URL}/api/image/${m.file_id}`;
-                    isVideo = m.type === 'video';
-                } else if (p.file_id) {
-                    imageUrl = `${API_URL}/api/image/${p.file_id}`;
-                    isVideo = p.type === 'video';
-                }
-
-                const mediaTag = isVideo 
-                    ? `<div class="relative w-full h-44 overflow-hidden rounded-2xl mb-2.5 bg-slate-900 flex items-center justify-center"><video src="${imageUrl}" muted loop autoplay playsinline class="w-full h-full object-cover pointer-events-none"></video><span class="absolute top-2 right-2 bg-black/60 text-white text-[8px] px-1.5 py-0.5 rounded-md font-bold tracking-wider">🎥 VIDEO</span></div>`
-                    : `<img src="${imageUrl}" class="w-full h-44 object-cover rounded-2xl mb-2.5 bg-slate-50">`;
-
-                container.innerHTML += `
-                    <div onclick="openDetailModal('${p._id}')" class="bg-white p-3 rounded-3xl shadow-xs border border-pink-50 flex flex-col justify-between cursor-pointer active:scale-98 transition-all">
-                        <div>
-                            ${mediaTag}
-                            <h3 class="font-bold text-xs text-slate-800 line-clamp-1 px-1">${p.name || 'No Name'}</h3>
-                            <p class="text-[11px] text-slate-400 line-clamp-2 mt-1 px-1 leading-relaxed">${p.description || ''}</p>
+            mainCategories.forEach((cat, index) => {
+                const catName = cat.name || cat.title || "Collection";
+                
+                // Luxury Clean Layout Category Block
+                grid.innerHTML += `
+                    <div onclick="selectCategory('${cat._id}', '${catName}')" class="bg-white border border-neutral-200/70 rounded-2xl p-5 flex justify-between items-center cursor-pointer hover:border-black active:scale-98 transition-all shadow-2xs relative overflow-hidden group">
+                        <div class="z-10">
+                            <span class="text-[9px] font-mono text-neutral-400 block tracking-widest mb-1">0${index + 1} / COLLECTION</span>
+                            <h3 class="font-extrabold text-sm text-neutral-900 tracking-wider uppercase">${catName}</h3>
                         </div>
-                        <div class="mt-3 border-t border-slate-50 pt-2 px-1 flex justify-end">
-                            <span class="text-[9px] text-violet-500 font-bold bg-violet-50 px-2 py-1 rounded-md">အသေးစိတ်ကြည့်ရန် ✨</span>
+                        <div class="flex items-center gap-2 z-10">
+                            <span class="text-[10px] text-neutral-400 font-bold tracking-widest uppercase group-hover:text-black transition-colors">EXPLORE</span>
+                            <span class="text-neutral-300 group-hover:translate-x-1 transition-transform">→</span>
                         </div>
                     </div>
                 `;
             });
         }
 
+        // 🎯 Menu တစ်ခုကို နှိပ်လိုက်မှ သက်ဆိုင်ရာ Product များကို စစ်ထုတ်ပြသသည့်စနစ်
+        function selectCategory(catId, catName) {
+            document.getElementById('current-category-title').innerText = catName;
+            
+            const container = document.getElementById('shop-container');
+            container.innerHTML = '';
+
+            // Filter products matching clicked category _id
+            let filtered = allProducts.filter(p => {
+                const pCatId = p.category_id || p.category;
+                return pCatId && pCatId.toString().trim() === catId.toString().trim();
+            });
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<p class="col-span-2 text-center text-neutral-400 my-16 text-xs">ဤကဏ္ဍတွင် ပစ္စည်းများ မရှိသေးပါရှင်။</p>`;
+            } else {
+                filtered.forEach(p => {
+                    let imageUrl = 'https://placehold.co/400x500?text=S%26S7+Fashion';
+                    let isVideo = false;
+
+                    if (p.colors?.[0]?.media?.[0]?.file_id) {
+                        const m = p.colors[0].media[0];
+                        imageUrl = `${API_URL}/api/image/${m.file_id}`;
+                        isVideo = m.type === 'video';
+                    } else if (p.file_id) {
+                        imageUrl = `${API_URL}/api/image/${p.file_id}`;
+                        isVideo = p.type === 'video';
+                    }
+
+                    const mediaTag = isVideo 
+                        ? `<div class="relative w-full h-52 overflow-hidden bg-neutral-100 flex items-center justify-center"><video src="${imageUrl}" muted loop autoplay playsinline class="w-full h-full object-cover pointer-events-none"></video></div>`
+                        : `<img src="${imageUrl}" class="w-full h-52 object-cover bg-neutral-50">`;
+
+                    container.innerHTML += `
+                        <div onclick="openDetailModal('${p._id}')" class="bg-white border border-neutral-100 flex flex-col justify-between cursor-pointer group">
+                            <div class="overflow-hidden rounded-xl relative">
+                                ${mediaTag}
+                            </div>
+                            <div class="py-2.5 px-1">
+                                <h3 class="font-bold text-xs text-neutral-900 tracking-tight line-clamp-1">${p.name || 'Untitled'}</h3>
+                                <p class="text-[10px] text-neutral-400 mt-0.5 tracking-widest uppercase">View Details</p>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            // Smooth UI Switch View
+            document.getElementById('landing-view').classList.add('hidden');
+            document.getElementById('product-view').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function backToMainMenu() {
+            document.getElementById('product-view').classList.add('hidden');
+            document.getElementById('landing-view').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // 🔮 PREMIUM OVERHAULED MODAL DESIGN (PRODUCT-FIRST DETAILED SHEET)
         function openDetailModal(productId) {
             const product = allProducts.find(p => p._id === productId);
             if (!product) return;
 
-            document.getElementById('detail-title').innerText = product.name || 'No Name';
-            document.getElementById('detail-desc').innerText = product.description || 'အညွှန်းမရှိပါ။';
-            document.getElementById('detail-add-btn').setAttribute('onclick', `addToCartFromDetail('${product._id}', '${product.name || "Item"}')`);
+            document.getElementById('detail-title').innerText = product.name || 'Untitled Piece';
+            document.getElementById('detail-desc').innerText = product.description || 'အညွှန်း မဖော်ပြထားပါရှင်။';
+            document.getElementById('detail-add-btn').setAttribute('onclick', `addToCartFromDetail('${product._id}', '${product.name || "Premium Item"}')`);
 
             const sliderContainer = document.getElementById('detail-media-slider');
             sliderContainer.innerHTML = '';
@@ -249,7 +269,7 @@
                 });
                 document.getElementById('swipe-badge').classList.toggle('hidden', mediaList.length <= 1);
             } else {
-                sliderContainer.innerHTML = `<div class="w-full h-full flex items-center justify-center text-slate-400 text-xs bg-slate-900">No Image</div>`;
+                sliderContainer.innerHTML = `<div class="w-full h-full flex items-center justify-center text-neutral-400 text-xs bg-neutral-900">No Image</div>`;
                 document.getElementById('swipe-badge').classList.add('hidden');
             }
 
@@ -275,29 +295,24 @@
             if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
         }
 
-        // စျေးနှုန်းလုံးဝမပါဘဲ ရွေးထားသည့်ပစ္စည်းစာရင်းနှင့် အရေအတွက်ကိုသာ ပြသပေးမည့် UI စနစ်
         function updateCartUI() {
             document.getElementById('cart-count').innerText = cart.reduce((sum, item) => sum + item.qty, 0);
             const cartItemsContainer = document.getElementById('cart-items');
             cartItemsContainer.innerHTML = '';
             
             if (cart.length === 0) {
-                cartItemsContainer.innerHTML = `<p class="text-center text-xs text-slate-400 py-8">ခြင်းတောင်းထဲမှာ ပစ္စည်းမရှိသေးပါရှင် 🌸</p>`;
+                cartItemsContainer.innerHTML = `<p class="text-center text-xs text-neutral-400 py-12 font-medium">ခြင်းတောင်းထဲမှာ အထည်မရှိသေးပါရှင် 🖤</p>`;
                 return;
             }
 
             cart.forEach(item => {
                 cartItemsContainer.innerHTML += `
-                    <div class="flex justify-between items-center bg-pink-50/40 p-4 rounded-2xl border border-pink-100/40 shadow-2xs">
+                    <div class="flex justify-between items-center bg-neutral-50 p-4 rounded-xl border border-neutral-200/50">
                         <div class="flex items-center gap-3">
-                            <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-pink-400 to-violet-400 flex items-center justify-center text-white text-xs font-bold">👗</div>
-                            <div>
-                                <p class="font-bold text-xs text-slate-700">${item.name}</p>
-                            </div>
+                            <span class="text-base">✨</span>
+                            <p class="font-bold text-xs text-neutral-800">${item.name}</p>
                         </div>
-                        <div class="flex items-center gap-2">
-                            <span class="bg-pink-500 text-white px-3 py-1 rounded-xl text-[11px] font-extrabold shadow-2xs">x ${item.qty}</span>
-                        </div>
+                        <span class="bg-neutral-900 text-white px-3 py-1 rounded-md text-[10px] font-black">QTY: ${item.qty}</span>
                     </div>
                 `;
             });
