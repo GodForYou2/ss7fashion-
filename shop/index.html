@@ -3,123 +3,302 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>S&S7 Fashion Online Shop</title>
+    <title>S&S7 Fashion - Premium Pink Store</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body { font-family: 'Pyidaungsu', sans-serif; background-color: #f8fafc; }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Pyidaungsu:wght@400;700&display=swap');
+        body { 
+            font-family: 'Plus Jakarta Sans', 'Pyidaungsu', sans-serif; 
+            background: linear-gradient(180deg, #fff1f2 0%, #fffbfa 100%);
+        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .pink-gradient { background: linear-gradient(135deg, #ff8da1 0%, #f43f5e 100%); }
+        .pink-glow { box-shadow: 0 10px 25px -5px rgba(244, 63, 94, 0.2); }
+        .glass-card { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(10px); }
     </style>
 </head>
-<body class="p-4">
+<body class="p-4 min-h-screen text-slate-800 pb-24">
 
-    <div class="flex justify-between items-center bg-white p-4 rounded-2xl shadow-sm mb-6">
+    <div class="w-full bg-rose-500 text-white text-[10px] py-1 px-4 rounded-full text-center font-medium mb-4 tracking-wider animate-pulse">
+        ✨ NEW ARRIVALS: အသစ်စက်စက် ဖက်ရှင်များကို ဦးဦးဖျားဖျား ဝယ်ယူလိုက်ပါ ✨
+    </div>
+
+    <div class="flex justify-between items-center glass-card p-4 rounded-3xl shadow-xs border border-rose-100/50 mb-5">
         <div>
-            <h1 class="text-xl font-bold text-indigo-600">🛍️ S&S7 Fashion</h1>
-            <p id="user-greeting" class="text-xs text-gray-500 mt-1">မင်္ဂလာပါ ဝယ်သူတော်ကြီး 🙏</p>
+            <h1 class="text-2xl font-extrabold tracking-tight bg-gradient-to-r from-rose-500 to-pink-600 bg-clip-text text-transparent">
+                S&S7 Fashion
+            </h1>
+            <p id="user-greeting" class="text-xs text-rose-400 font-medium mt-0.5">မင်္ဂလာပါ သခင်လေး 🙏</p>
         </div>
-        <div class="relative bg-indigo-50 p-3 rounded-xl cursor-pointer" onclick="toggleCartModal()">
-            <span class="text-xl">🛒</span>
-            <span id="cart-count" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">0</span>
+        <div class="relative bg-rose-50 hover:bg-rose-100 p-3.5 rounded-2xl cursor-pointer transition-all active:scale-90" onclick="toggleCartModal()">
+            <span class="text-xl">🛍️</span>
+            <span id="cart-count" class="absolute -top-1.5 -right-1.5 pink-gradient text-white text-[10px] w-5 h-5 rounded-full flex items-center justify-center font-bold border-2 border-white shadow-xs">0</span>
         </div>
+    </div>
+
+    <div id="main-category-menu" class="flex gap-2.5 overflow-x-auto no-scrollbar pb-3">
+        <button onclick="filterMainCategory('all')" id="cat-all" class="pink-gradient text-white px-5 py-2.5 rounded-2xl text-xs font-semibold whitespace-nowrap pink-glow">
+            ✨ အားလုံးကြည့်မည်
+        </button>
     </div>
 
     <div id="shop-container" class="grid grid-cols-2 gap-4">
-        <p id="loading-text" class="col-span-2 text-center text-gray-400 my-10 text-sm">ပစ္စည်းများကို ဆွဲယူနေပါသည်...</p>
+        <p id="loading-text" class="col-span-2 text-center text-rose-400 font-medium my-12 text-sm">
+            🌸 ချစ်စရာ ပစ္စည်းလေးများကို ဆွဲယူနေပါသည်...
+        </p>
     </div>
 
-    <div id="cart-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-end justify-center">
-        <div class="bg-white w-full max-w-md rounded-t-3xl p-6 shadow-xl max-h-[80vh] overflow-y-auto">
-            <div class="flex justify-between items-center mb-4 border-b pb-2">
-                <h2 class="text-lg font-bold">🛒 ဝယ်ယူမည့်စာရင်း</h2>
-                <button onclick="toggleCartModal()" class="text-gray-400 text-xl font-bold">&times;</button>
+    <div id="detail-modal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-end justify-center transition-all duration-300">
+        <div class="bg-white w-full max-w-md rounded-t-[2.5rem] shadow-2xl max-h-[92vh] overflow-y-auto border-t border-rose-100 animate-slideUp">
+            
+            <div class="absolute top-4 right-4 z-50">
+                <button onclick="closeDetailModal()" class="w-9 h-9 bg-black/40 backdrop-blur-md text-white rounded-full text-xl font-bold flex items-center justify-center active:scale-90">&times;</button>
             </div>
-            <div id="cart-items" class="space-y-4"></div>
-            <div class="border-t mt-4 pt-4">
-                <div class="flex justify-between font-bold text-lg mb-4">
-                    <span>စုစုပေါင်းကျသင့်ငွေ:</span>
-                    <span id="cart-total">0 MMK</span>
+
+            <div class="relative w-full h-[45vh] bg-slate-900">
+                <div id="detail-media-slider" class="w-full h-full flex overflow-x-auto snap-x snap-mandatory no-scrollbar">
+                    </div>
+                <div class="absolute bottom-3 right-4 bg-black/50 text-white text-[10px] px-2.5 py-1 rounded-full font-medium tracking-wide">
+                    👈 Swipe ဘယ်ညာဆွဲကြည့်ရန်
                 </div>
-                <button onclick="checkoutOrder()" class="w-full bg-indigo-600 text-white py-3 rounded-xl font-bold shadow-lg hover:bg-indigo-700 active:scale-95 transition-all">
-                    ✅ အော်ဒါတင်မည်
+            </div>
+
+            <div class="p-6 bg-white rounded-t-[2.5rem] -mt-6 relative z-10">
+                <div class="w-12 h-1 bg-slate-200 rounded-full mx-auto mb-4"></div>
+                
+                <h2 id="detail-title" class="text-xl font-extrabold text-slate-800 leading-snug">Product Name</h2>
+                <span class="inline-block mt-2 bg-rose-50 text-rose-500 font-bold text-[10px] uppercase tracking-wider px-2.5 py-1 rounded-lg">In-Stock ✨</span>
+                
+                <div class="mt-5">
+                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider">အသေးစိတ်အညွှန်း (Description)</h4>
+                    <p id="detail-desc" class="text-sm text-slate-600 mt-2 leading-relaxed whitespace-pre-line bg-rose-50/30 p-4 rounded-2xl border border-rose-100/30">
+                        Product Description goes here...
+                    </p>
+                </div>
+
+                <div class="mt-6">
+                    <button id="detail-add-btn" class="w-full pink-gradient text-white py-4 rounded-2xl font-bold shadow-lg pink-glow hover:opacity-95 active:scale-95 transition-all text-sm tracking-wide">
+                        💖 ခြင်းတောင်းထဲထည့်မည်
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="cart-modal" class="hidden fixed inset-0 bg-black/40 z-50 flex items-end justify-center">
+        <div class="bg-white/95 backdrop-blur-md w-full max-w-md rounded-t-[2.5rem] p-6 shadow-2xl max-h-[85vh] overflow-y-auto border-t border-rose-100">
+            <div class="flex justify-between items-center mb-5 border-b border-rose-50 pb-3">
+                <div class="flex items-center gap-2">
+                    <span class="text-xl">🛒</span>
+                    <h2 class="text-lg font-bold text-slate-800">ခြင်းတောင်းထဲက စာရင်း</h2>
+                </div>
+                <button onclick="toggleCartModal()" class="w-8 h-8 bg-rose-50 text-rose-500 rounded-full text-lg font-bold flex items-center justify-center active:scale-90">&times;</button>
+            </div>
+            <div id="cart-items" class="space-y-3 max-h-[40vh] overflow-y-auto pr-1 no-scrollbar"></div>
+            <div class="border-t border-rose-50 mt-5 pt-5">
+                <button onclick="checkoutOrder()" class="w-full pink-gradient text-white py-4 rounded-2xl font-bold shadow-lg pink-glow hover:opacity-95 active:scale-95 transition-all text-sm tracking-wide">
+                    💖 အော်ဒါအတည်ပြုမည်
                 </button>
             </div>
         </div>
     </div>
 
     <script>
-        // 🔗 ⚠️ သင့်ရဲ့ Serveo လင့်ကို ဒီနေရာမှာ ပြောင်းထည့်ပေးပါဗျာ
         const API_URL = "https://myshop-1833.onrender.com"; 
         
+        let allProducts = [];
+        let allCategories = [];
+        let selectedMainCatId = 'all';
         let cart = [];
+        
         let tg = window.Telegram.WebApp;
-        tg.ready();
-        tg.expand();
+        tg.ready(); tg.expand();
 
         if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-            document.getElementById('user-greeting').innerText = `မင်္ဂလာပါ ${tg.initDataUnsafe.user.first_name} 🙏`;
+            document.getElementById('user-greeting').innerText = `မင်္ဂလာပါ ${tg.initDataUnsafe.user.first_name} ✨`;
         }
 
-        async function loadProducts() {
+        async function initShop() {
             try {
-                const response = await fetch(`${API_URL}/api/products`);
-                const products = await response.json();
-                const container = document.getElementById('shop-container');
-                document.getElementById('loading-text').classList.add('hidden');
+                const catRes = await fetch(`${API_URL}/api/products`); 
+                allProducts = await catRes.json();
 
-                if (products.length === 0) {
-                    container.innerHTML = `<p class="col-span-2 text-center text-gray-400 my-10">ဆိုင်ထဲတွင် ပစ္စည်းမရှိသေးပါဗျာ။</p>`;
-                    return;
-                }
+                // 🗓️ MongoDB _id မှ Timestamp ယူပြီး Newest First (အသစ်ဆုံး) အရင်စီခြင်း
+                allProducts.sort((a, b) => b._id.toString().substring(0,8).localeCompare(a._id.toString().substring(0,8)));
 
-                products.forEach(p => {
-                    const fileId = p.colors[0]?.media[0]?.file_id;
-                    const imageUrl = fileId ? `${API_URL}/api/image/${fileId}` : 'https://placehold.co/300x300?text=No+Image';
-
-                    container.innerHTML += `
-                        <div class="bg-white p-3 rounded-2xl shadow-xs border border-gray-100 flex flex-col justify-between">
-                            <img src="${imageUrl}" class="w-full h-40 object-cover rounded-xl mb-2 bg-gray-50">
-                            <div>
-                                <h3 class="font-bold text-sm line-clamp-1">${p.name}</h3>
-                                <p class="text-xs text-gray-400 line-clamp-2 mt-1">${p.description}</p>
-                            </div>
-                            <div class="mt-3">
-                                <span class="text-indigo-600 font-bold text-sm block mb-2">In-Stock</span>
-                                <button onclick="addToCart('${p._id}', '${p.name}', 10000)" class="w-full bg-gray-900 text-white text-xs py-2 rounded-xl font-medium active:bg-indigo-600 transition-colors">
-                                    + ခြင်းတောင်းထဲထည့်
-                                </button>
-                            </div>
-                        </div>
-                    `;
-                });
+                extractCategories();
+                renderMainCategories();
+                renderProducts();
             } catch (error) {
-                document.getElementById('loading-text').innerText = "⚠️ ဆာဗာနှင့် ချိတ်ဆက်၍မရပါ (API Off နေနိုင်ပါသည်)";
+                document.getElementById('loading-text').innerHTML = "❌ <span class='text-red-500'>ဆာဗာချိတ်ဆက်မှု မအောင်မြင်ပါဗျာ</span>";
             }
         }
 
-        function addToCart(id, name, price) {
+        function extractCategories() {
+            let uniqueCats = [...new Set(allProducts.map(p => p.category_id))];
+            allCategories = uniqueCats.map((catId, index) => ({
+                _id: catId,
+                name: index === 0 ? "အမျိုးသားဝတ်" : "အမျိုးသမီးဝတ်", 
+                parent_id: null 
+            }));
+        }
+
+        function renderMainCategories() {
+            const menuContainer = document.getElementById('main-category-menu');
+            menuContainer.innerHTML = `<button onclick="filterMainCategory('all')" id="cat-all" class="pink-gradient text-white px-5 py-2.5 rounded-2xl text-xs font-semibold whitespace-nowrap pink-glow">✨ အားလုံးကြည့်မည်</button>`;
+            
+            allCategories.forEach(cat => {
+                menuContainer.innerHTML += `
+                    <button onclick="filterMainCategory('${cat._id}')" id="cat-${cat._id}" class="bg-white text-rose-500 border border-rose-100/70 px-5 py-2.5 rounded-2xl text-xs font-medium whitespace-nowrap shadow-xs">
+                        ${cat.name}
+                    </button>
+                `;
+            });
+        }
+
+        function filterMainCategory(catId) {
+            selectedMainCatId = catId;
+            document.querySelectorAll('#main-category-menu button').forEach(b => {
+                b.classList.remove('pink-gradient', 'text-white', 'pink-glow', 'font-semibold');
+                b.classList.add('bg-white', 'text-rose-500', 'border', 'border-rose-100/70', 'font-medium');
+            });
+            const activeBtn = document.getElementById(`cat-${catId}`);
+            activeBtn.classList.remove('bg-white', 'text-rose-500', 'border', 'border-rose-100/70', 'font-medium');
+            activeBtn.classList.add('pink-gradient', 'text-white', 'pink-glow', 'font-semibold');
+            renderProducts();
+        }
+
+        function renderProducts() {
+            const container = document.getElementById('shop-container');
+            container.innerHTML = '';
+            document.getElementById('loading-text').classList.add('hidden');
+
+            let filtered = allProducts;
+            if (selectedMainCatId !== 'all') {
+                filtered = filtered.filter(p => p.category_id === selectedMainCatId);
+            }
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<div class="col-span-2 text-center py-12"><p class="text-xs text-rose-400 font-medium">🌸 ပစ္စည်းမရှိသေးပါဗျာ။</p></div>`;
+                return;
+            }
+
+            filtered.forEach((p, idx) => {
+                const firstColor = p.colors[0];
+                const firstMedia = firstColor?.media[0];
+                let coverHtml = '';
+
+                if (firstMedia) {
+                    const mediaUrl = `${API_URL}/api/image/${firstMedia.file_id}`;
+                    if (firstMedia.type === 'video') {
+                        coverHtml = `<video src="${mediaUrl}" class="w-full h-48 object-cover rounded-2xl bg-black pointer-events-none"></video><div class="absolute inset-0 flex items-center justify-center bg-black/20"><span class="text-white bg-black/40 px-2 py-1 rounded-lg text-[10px]">🎥 Video</span></div>`;
+                    } else {
+                        coverHtml = `<img src="${mediaUrl}" class="w-full h-48 object-cover rounded-2xl bg-rose-50/30">`;
+                    }
+                }
+
+                const isNewBadge = idx < 2 ? `<span class="absolute top-2.5 left-2.5 pink-gradient text-white text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">New ✨</span>` : '';
+
+                // ⚠️ နှိပ်လိုက်တာနဲ့ အသေးစိတ် Modal ပွင့်သွားအောင် 'openDetailModal' ချိတ်ဆက်ထားသည်
+                container.innerHTML += `
+                    <div onclick="openDetailModal('${p._id}')" class="bg-white rounded-3xl p-3 border border-rose-100/40 shadow-xs flex flex-col justify-between relative cursor-pointer active:scale-98 transition-transform">
+                        <div class="relative overflow-hidden rounded-2xl">
+                            ${coverHtml}
+                            ${isNewBadge}
+                        </div>
+                        <div class="mt-2.5 px-1 flex-grow">
+                            <h3 class="font-bold text-xs text-slate-800 line-clamp-1">${p.name}</h3>
+                            <p class="text-[10px] text-slate-400 line-clamp-2 mt-1 leading-relaxed">${p.description}</p>
+                        </div>
+                        <div class="mt-3">
+                            <span class="w-full text-center block text-[11px] text-rose-500 font-semibold py-2 bg-rose-50 rounded-xl">
+                                👀 အသေးစိတ်ကြည့်မည်
+                            </span>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // =======================================================
+        // 🔮 NEW: PRODUCT DETAIL MODAL LOGIC (ALL IMAGES & VIDEOS)
+        // =======================================================
+        function openDetailModal(productId) {
+            const product = allProducts.find(p => p._id === productId);
+            if (!product) return;
+
+            document.getElementById('detail-title').innerText = product.name;
+            document.getElementById('detail-desc').innerText = product.description;
+
+            // ခြင်းတောင်းထဲထည့်မည့် Button Function ကို လက်ရှိ ပစ္စည်း ID ပြောင်းပေးခြင်း
+            document.getElementById('detail-add-btn').setAttribute('onclick', `addToCartFromDetail('${product._id}', '${product.name}')`);
+
+            // စုဆောင်းထားသမျှ ရှိသမျှ အရောင်ခွဲတွေရဲ့ ပုံ/ဗီဒီယို အကုန်ဆွဲထုတ်ခြင်း
+            const sliderContainer = document.getElementById('detail-media-slider');
+            sliderContainer.innerHTML = '';
+
+            product.colors.forEach(color => {
+                color.media.forEach(media => {
+                    const mediaUrl = `${API_URL}/api/image/${media.file_id}`;
+                    let itemHtml = `<div class="w-full h-full flex-shrink-0 snap-center">`;
+                    
+                    if (media.type === 'video') {
+                        itemHtml += `<video src="${mediaUrl}" controls playsinline class="w-full h-full object-cover bg-black"></video>`;
+                    } else {
+                        itemHtml += `<img src="${mediaUrl}" class="w-full h-full object-cover bg-rose-50/20">`;
+                    }
+                    
+                    itemHtml += `</div>`;
+                    sliderContainer.innerHTML += itemHtml;
+                });
+            });
+
+            // Show Modal
+            document.getElementById('detail-modal').classList.remove('hidden');
+            if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+        }
+
+        function closeDetailModal() {
+            document.getElementById('detail-modal').classList.add('hidden');
+            // Modal ပိတ်ရင် ဗီဒီယိုတွေပါ ရပ်သွားအောင် slider ကို ရှင်းလိုက်သည်
+            document.getElementById('detail-media-slider').innerHTML = '';
+        }
+
+        function addToCartFromDetail(id, name) {
+            addToCart(id, name);
+            closeDetailModal();
+        }
+
+        function addToCart(id, name) {
             let item = cart.find(x => x.id === id);
-            if (item) { item.qty++; } else { cart.push({ id, name, price, qty: 1 }); }
+            if (item) { item.qty++; } else { cart.push({ id, name, qty: 1 }); }
             updateCartUI();
+            if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
         }
 
         function updateCartUI() {
             document.getElementById('cart-count').innerText = cart.reduce((sum, item) => sum + item.qty, 0);
             const cartItemsContainer = document.getElementById('cart-items');
             cartItemsContainer.innerHTML = '';
-            let total = 0;
+            
+            if (cart.length === 0) {
+                cartItemsContainer.innerHTML = `<p class="text-center text-xs text-slate-400 py-6">ခြင်းတောင်းထဲမှာ ပစ္စည်းမရှိသေးပါရှင် 🌸</p>`;
+                return;
+            }
+
             cart.forEach(item => {
-                total += item.price * item.qty;
                 cartItemsContainer.innerHTML += `
-                    <div class="flex justify-between items-center bg-gray-50 p-3 rounded-xl">
-                        <div>
-                            <p class="font-bold text-sm">${item.name}</p>
-                            <p class="text-xs text-gray-400">${item.price.toLocaleString()} MMK</p>
+                    <div class="flex justify-between items-center bg-rose-50/50 p-3.5 rounded-2xl border border-rose-100/30">
+                        <div class="flex items-center gap-2">
+                            <span class="text-rose-400">👚</span>
+                            <p class="font-bold text-xs text-slate-700">${item.name}</p>
                         </div>
-                        <span class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-lg text-xs font-bold">x ${item.qty}</span>
+                        <span class="bg-rose-500 text-white px-2.5 py-0.5 rounded-lg text-[10px] font-bold">x ${item.qty}</span>
                     </div>
                 `;
             });
-            document.getElementById('cart-total').innerText = total.toLocaleString() + " MMK";
         }
 
         function toggleCartModal() {
@@ -129,13 +308,8 @@
         async function checkoutOrder() {
             if (cart.length === 0) return alert("ခြင်းတောင်းထဲတွင် ပစ္စည်းမရှိသေးပါဗျာ။");
             let userId = tg.initDataUnsafe?.user?.id || 12345678;
-            let totalPrice = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
 
-            const orderPayload = {
-                user_id: parseInt(userId),
-                items: cart,
-                total_price: totalPrice
-            };
+            const orderPayload = { user_id: parseInt(userId), items: cart };
 
             try {
                 const response = await fetch(`${API_URL}/api/orders`, {
@@ -145,14 +319,15 @@
                 });
                 const result = await response.json();
                 if (result.status === "success") {
-                    alert("🎉 မှာယူမှု အောင်မြင်ပါသည်ဗျာ။");
+                    alert("🎉 အော်ဒါတင်တာ အောင်မြင်ပါတယ်ရှင်! လူကြီးမင်းကို ကျေးဇူးအထူးတင်ရှိပါတယ်။");
                     cart = []; updateCartUI(); toggleCartModal(); tg.close();
                 }
             } catch (error) {
                 alert("❌ အော်ဒါတင်မရပါ၊ ဆာဗာချိတ်ဆက်မှု စစ်ဆေးပေးပါ။");
             }
         }
-        loadProducts();
+
+        initShop();
     </script>
 </body>
 </html>
