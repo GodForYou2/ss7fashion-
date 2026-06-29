@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-    <title>S&S7 Fashion - Smooth Swipe Hub</title>
+    <title>S&S7 Fashion - Perfect Touch Hub</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
@@ -12,43 +12,50 @@
             font-family: 'Plus Jakarta Sans', 'Pyidaungsu', sans-serif; 
             background: linear-gradient(180deg, #fdf2f8 0%, #f8fafc 100%);
         }
-        /* Native Smooth Scrolling for Swipe */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         .luxury-gradient { background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%); }
         .luxury-glow { box-shadow: 0 8px 20px -5px rgba(236, 72, 153, 0.3); }
         .glass-blur { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px); }
-        
-        /* 3D Card Effect */
-        .card-3d {
-            transform-style: preserve-3d;
-            transition: transform 0.2s ease;
-        }
 
-        /* Pure Native CSS Slider Container */
-        .slider-viewport {
-            display: flex;
-            overflow-x: auto;
-            scroll-snap-type: x mandatory;
-            scroll-behavior: smooth;
-            -webkit-overflow-scrolling: touch;
+        /* Multi-Media Track Container */
+        .slider-container {
+            position: relative;
             width: 100%;
             height: 100%;
+            overflow: hidden;
+            touch-action: none; /* Crucial for internal touch control */
+        }
+        .slider-track {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            will-change: transform;
         }
         .slide-item {
             flex: 0 0 100%;
             width: 100%;
             height: 100%;
-            scroll-snap-align: start;
             display: flex;
             align-items: center;
             justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+        .zoomable-target {
+            max-width: 100%;
+            max-height: 42vh;
+            object-fit: contain;
+            border-radius: 1rem;
+            will-change: transform;
+            transform-origin: center center;
+            transition: transform 0.1s ease-out;
         }
     </style>
 </head>
 <body class="p-4 min-h-screen text-slate-800 pb-24">
 
-    <!-- Top Header -->
     <div class="flex justify-between items-center glass-blur p-4 rounded-3xl border border-pink-100/50 mb-5 sticky top-0 z-40 shadow-xs">
         <div>
             <h1 class="text-xl font-black tracking-wider bg-gradient-to-r from-pink-500 to-violet-600 bg-clip-text text-transparent">S&S7 FASHION</h1>
@@ -60,7 +67,6 @@
         </div>
     </div>
 
-    <!-- Category Views -->
     <div id="root-menu-view" class="space-y-4">
         <div class="mb-2 px-1">
             <h2 class="text-xs font-black text-pink-500 uppercase tracking-widest">ပင်မကဏ္ဍများ (Categories)</h2>
@@ -86,7 +92,6 @@
         <div id="shop-container" class="grid grid-cols-2 gap-3"></div>
     </div>
 
-    <!-- Optimized & Ultra Smooth Detail Modal -->
     <div id="detail-modal" class="hidden fixed inset-0 bg-black/85 z-50 flex items-end justify-center transition-all duration-300">
         <div class="bg-white w-full max-w-md rounded-t-[2.5rem] shadow-2xl max-h-[85vh] relative border-t border-pink-50 flex flex-col overflow-hidden">
             
@@ -94,20 +99,18 @@
                 <button onclick="closeDetailModal()" class="w-8 h-8 bg-black/40 backdrop-blur-md text-white rounded-full text-lg font-bold flex items-center justify-center active:scale-90 shadow-md">&times;</button>
             </div>
 
-            <!-- Native Swipe Viewport (Zero JS Conflict) -->
             <div class="relative w-full h-[42vh] bg-slate-950 rounded-t-[2.5rem] overflow-hidden flex-shrink-0">
-                <div id="detail-media-slider" class="slider-viewport no-scrollbar">
-                    <!-- Slides inject dynamically here -->
+                <div id="touch-slider-box" class="slider-container">
+                    <div id="detail-media-slider" class="slider-track">
+                        </div>
                 </div>
                 
-                <!-- Overlay Guides -->
                 <div class="absolute bottom-3 left-3 right-3 flex justify-between items-center px-3 py-1.5 bg-black/60 rounded-xl backdrop-blur-md pointer-events-none">
-                    <span id="swipe-badge" class="text-white text-[9px] font-bold tracking-widest uppercase animate-pulse">↔ Swipe ဘေးသို့ရွှေ့ကြည့်ပါ</span>
-                    <span class="text-white text-[9px] font-medium tracking-wide">✨ HD Quality</span>
+                    <span id="swipe-badge" class="text-white text-[9px] font-bold tracking-widest uppercase animate-pulse">↔ Swipe ဘေးရွှေ့ / 👆 ၂ချောင်းဖြင့်ချဲ့</span>
+                    <span id="slide-index-counter" class="text-white text-[9px] font-mono">1/1</span>
                 </div>
             </div>
 
-            <!-- Compact Details & Spacing -->
             <div class="p-5 bg-white flex-1 flex flex-col justify-between overflow-y-auto max-h-[43vh] no-scrollbar">
                 <div class="space-y-3">
                     <div>
@@ -120,7 +123,6 @@
                     </div>
                 </div>
 
-                <!-- Compact Action Button -->
                 <div class="mt-4 pt-1">
                     <button id="detail-add-btn" class="w-full luxury-gradient text-white py-3 rounded-xl font-bold tracking-widest luxury-glow active:scale-98 transition-all text-xs uppercase flex items-center justify-center gap-2">
                         🛍️ ခြင်းတောင်းထဲထည့်မည်
@@ -130,7 +132,6 @@
         </div>
     </div>
 
-    <!-- Cart Modal -->
     <div id="cart-modal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-end justify-center">
         <div class="bg-white w-full max-w-md rounded-t-[2.5rem] p-6 shadow-2xl max-h-[80vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-5 border-b border-pink-50 pb-3">
@@ -245,7 +246,7 @@
                         : `<img src="${imageUrl}" class="w-full h-44 object-cover bg-slate-50">`;
 
                     container.innerHTML += `
-                        <div onclick="openDetailModal('${p._id}')" class="bg-white border border-pink-50/60 rounded-2xl overflow-hidden flex flex-col justify-between cursor-pointer p-2 shadow-2xs card-3d-trigger">
+                        <div onclick="openDetailModal('${p._id}')" class="bg-white border border-pink-50/60 rounded-2xl overflow-hidden flex flex-col justify-between cursor-pointer p-2 shadow-2xs">
                             <div class="overflow-hidden rounded-xl relative">${mediaTag}</div>
                             <div class="pt-2 px-1 pb-1">
                                 <h3 class="font-bold text-[11px] text-slate-800 line-clamp-1">${p.name || 'Untitled'}</h3>
@@ -253,7 +254,6 @@
                             </div>
                         </div>`;
                 });
-                init3DEffect();
             }
             document.getElementById('sub-menu-view').classList.add('hidden');
             document.getElementById('product-view').classList.remove('hidden');
@@ -269,21 +269,10 @@
             document.getElementById('sub-menu-view').classList.remove('hidden');
         }
 
-        function init3DEffect() {
-            document.querySelectorAll('.card-3d-trigger').forEach(card => {
-                card.addEventListener('mousemove', (e) => {
-                    const rect = card.getBoundingClientRect();
-                    const x = e.clientX - rect.left - (rect.width/2);
-                    const y = e.clientY - rect.top - (rect.height/2);
-                    card.style.transform = `rotateY(${x * 0.05}deg) rotateX(${-y * 0.05}deg) scale(1.01)`;
-                });
-                card.addEventListener('mouseleave', () => {
-                    card.style.transform = `rotateY(0deg) rotateX(0deg) scale(1)`;
-                });
-            });
-        }
+        // 🌟 HIGH-PERFORMANCE CUSTOM SWIPE & ZOOM INFRASTRUCTURE
+        let currentSlideIndex = 0;
+        let totalSlidesCount = 0;
 
-        // 🔮 OPEN MODAL WITH NATIVE ULTRA-SMOOTH SWIPE
         function openDetailModal(productId) {
             const product = allProducts.find(p => p._id === productId);
             if (!product) return;
@@ -292,10 +281,12 @@
             document.getElementById('detail-desc').innerText = product.description || 'အညွှန်း မရှိပါ။';
             document.getElementById('detail-add-btn').setAttribute('onclick', `addToCart('${product._id}', '${product.name || "Premium Item"}')`);
 
-            const sliderContainer = document.getElementById('detail-media-slider');
-            sliderContainer.innerHTML = '';
-            let mediaList = [];
+            const sliderTrack = document.getElementById('detail-media-slider');
+            sliderTrack.innerHTML = '';
+            currentSlideIndex = 0;
+            sliderTrack.style.transform = `translateX(0px)`;
 
+            let mediaList = [];
             if (product.colors && Array.isArray(product.colors)) {
                 product.colors.forEach(c => {
                     if (c.media && Array.isArray(c.media)) {
@@ -307,37 +298,141 @@
                 mediaList.push({ file_id: product.file_id, type: product.type || 'image' });
             }
 
+            totalSlidesCount = mediaList.length;
+            document.getElementById('slide-index-counter').innerText = `1/${totalSlidesCount}`;
+
             if (mediaList.length > 0) {
                 mediaList.forEach((m) => {
                     const mediaUrl = `${API_URL}/api/image/${m.file_id}`;
                     let slideHtml = `<div class="slide-item">`;
-                    
                     if (m.type === 'video') {
-                        slideHtml += `<video src="${mediaUrl}" loop autoplay muted playsinline controls class="max-w-full max-h-full object-contain rounded-2xl bg-black"></video>`;
+                        slideHtml += `<video src="${mediaUrl}" loop autoplay muted playsinline controls class="zoomable-target bg-black"></video>`;
                     } else {
-                        slideHtml += `<img src="${mediaUrl}" class="max-w-full max-h-full object-contain rounded-2xl" alt="fashion-item">`;
+                        slideHtml += `<img src="${mediaUrl}" class="zoomable-target" alt="fashion-item">`;
                     }
                     slideHtml += `</div>`;
-                    sliderContainer.innerHTML += slideHtml;
+                    sliderTrack.innerHTML += slideHtml;
                 });
-                
-                document.getElementById('swipe-badge').classList.toggle('hidden', mediaList.length <= 1);
+                document.getElementById('swipe-badge').classList.toggle('hidden', totalSlidesCount <= 1);
+                initMasterTouchLogic();
             } else {
-                sliderContainer.innerHTML = `<div class="slide-item text-slate-400 text-xs bg-slate-900">No Image</div>`;
+                sliderTrack.innerHTML = `<div class="slide-item text-slate-400 text-xs bg-slate-900">No Image</div>`;
                 document.getElementById('swipe-badge').classList.add('hidden');
             }
 
-            // Pop Animation
-            const modalBox = document.querySelector('#detail-modal > div');
-            modalBox.style.transform = 'translateY(100px)';
             document.getElementById('detail-modal').classList.remove('hidden');
-            
-            setTimeout(() => {
-                modalBox.style.transition = 'transform 0.3s ease-out';
-                modalBox.style.transform = 'translateY(0)';
-            }, 20);
-
             if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+        }
+
+        function initMasterTouchLogic() {
+            const container = document.getElementById('touch-slider-box');
+            const track = document.getElementById('detail-media-slider');
+            
+            let startX = 0, startY = 0, currentX = 0;
+            let isSwiping = false, isZooming = false;
+            
+            let scale = 1, startDist = 0, initialScale = 1;
+            let panX = 0, panY = 0, startPanX = 0, startPanY = 0;
+
+            container.addEventListener('touchstart', (e) => {
+                const activeMedia = track.children[currentSlideIndex].querySelector('.zoomable-target');
+
+                if (e.touches.length === 2) {
+                    // Two fingers detected: Lock swipe, activate zoom mode
+                    isZooming = true;
+                    isSwiping = false;
+                    startDist = Math.hypot(
+                        e.touches[0].clientX - e.touches[1].clientX,
+                        e.touches[0].clientY - e.touches[1].clientY
+                    );
+                    initialScale = scale;
+                } else if (e.touches.length === 1) {
+                    if (scale > 1) {
+                        // Drag/Pan inside zoomed asset
+                        isZooming = true;
+                        isSwiping = false;
+                        startPanX = e.touches[0].clientX - panX;
+                        startPanY = e.touches[0].clientY - panY;
+                    } else {
+                        // Standard Single Swipe Gesture
+                        isSwiping = true;
+                        isZooming = false;
+                        startX = e.touches[0].clientX;
+                        startY = e.touches[0].clientY;
+                        track.style.transition = 'none'; // Unbind animation for drag response
+                    }
+                }
+            }, { passive: false });
+
+            container.addEventListener('touchmove', (e) => {
+                const activeMedia = track.children[currentSlideIndex].querySelector('.zoomable-target');
+
+                if (isZooming && e.touches.length === 2) {
+                    e.preventDefault();
+                    const currentDist = Math.hypot(
+                        e.touches[0].clientX - e.touches[1].clientX,
+                        e.touches[0].clientY - e.touches[1].clientY
+                    );
+                    scale = (currentDist / startDist) * initialScale;
+                    if (scale < 1) scale = 1;
+                    if (scale > 4) scale = 4;
+                    
+                    if (scale === 1) { panX = 0; panY = 0; }
+                    activeMedia.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
+                } 
+                else if (isZooming && e.touches.length === 1 && scale > 1) {
+                    e.preventDefault();
+                    panX = e.touches[0].clientX - startPanX;
+                    panY = e.touches[0].clientY - startPanY;
+                    
+                    // Constrain bounds inside view
+                    const limit = (scale - 1) * 80;
+                    if (panX > limit) panX = limit; if (panX < -limit) panX = -limit;
+                    if (panY > limit) panY = limit; if (panY < -limit) panY = -limit;
+                    
+                    activeMedia.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
+                } 
+                else if (isSwiping && e.touches.length === 1 && scale === 1) {
+                    currentX = e.touches[0].clientX;
+                    let diffX = currentX - startX;
+                    let diffY = e.touches[0].clientY - startY;
+
+                    // Confirm horizontal swipe intent rather than vertical layout scroll
+                    if (Math.abs(diffX) > Math.abs(diffY)) {
+                        e.preventDefault();
+                        let baseTranslate = -currentSlideIndex * container.offsetWidth;
+                        track.style.transform = `translateX(${baseTranslate + diffX}px)`;
+                    }
+                }
+            }, { passive: false });
+
+            container.addEventListener('touchend', (e) => {
+                const activeMedia = track.children[currentSlideIndex].querySelector('.zoomable-target');
+
+                if (isSwiping && scale === 1) {
+                    isSwiping = false;
+                    let diffX = currentX - startX;
+                    let threshold = container.offsetWidth * 0.22; // 22% drag completes slide change
+
+                    track.style.transition = 'transform 0.25s ease-out';
+                    if (diffX < -threshold && currentSlideIndex < totalSlidesCount - 1) {
+                        currentSlideIndex++;
+                    } else if (diffX > threshold && currentSlideIndex > 0) {
+                        currentSlideIndex--;
+                    }
+                    track.style.transform = `translateX(${-currentSlideIndex * container.offsetWidth}px)`;
+                    document.getElementById('slide-index-counter').innerText = `${currentSlideIndex + 1}/${totalSlidesCount}`;
+                }
+
+                if (e.touches.length === 0) {
+                    isZooming = false;
+                    // Auto restore layout context if scale is close to minimal baseline
+                    if (scale <= 1.08) {
+                        scale = 1; panX = 0; panY = 0;
+                        if(activeMedia) activeMedia.style.transform = `translate(0px, 0px) scale(1)`;
+                    }
+                }
+            });
         }
 
         function closeDetailModal() {
