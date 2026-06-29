@@ -105,10 +105,9 @@
                 <div id="touch-slider-box" class="slider-container">
                     <div id="detail-media-slider" class="slider-track"></div>
                 </div>
-                <!-- ယခင် Box ပုံစံမှ Transparent + Drop Shadow ပုံစံသို့ ပြောင်းလဲထားခြင်း -->
                 <div class="absolute top-4 left-4 right-4 flex justify-between items-center pointer-events-none drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)]">
-                     <span id="swipe-badge" class="text-white text-[10px] font-bold tracking-widest uppercase">↔ ပွတ်ဆွဲကြည့်ရန်</span>
-                     <span id="slide-index-counter" class="text-white text-[10px] font-mono font-bold">1/1</span>
+                    <span id="swipe-badge" class="text-white text-[10px] font-bold tracking-widest uppercase">↔ ပွတ်ဆွဲကြည့်ရန်</span>
+                    <span id="slide-index-counter" class="text-white text-[10px] font-mono font-bold">1/1</span>
                 </div>
             </div>
             <div class="p-5 bg-white flex-1 flex flex-col justify-between overflow-y-auto max-h-[43vh] no-scrollbar">
@@ -270,7 +269,7 @@
                 }
 
                 const mediaTag = isVideo 
-                    ? `<div class="relative w-full h-44 overflow-hidden bg-slate-900 flex items-center justify-center"><video src="${imageUrl}" muted loop autoplay playsinline class="w-full h-full object-cover pointer-events-none"></video></div>`
+                    ? `<div class="relative w-full h-44 overflow-hidden bg-slate-900 flex items-center justify-center"><video src="${imageUrl}" muted loop autoplay playsinline webkit-playsinline class="w-full h-full object-cover pointer-events-none"></video></div>`
                     : `<img src="${imageUrl}" class="w-full h-44 object-cover bg-slate-50" loading="lazy">`;
 
                 container.innerHTML += `
@@ -357,8 +356,9 @@
                 mediaList.forEach((m) => {
                     const mediaUrl = `${API_URL}/api/image/${m.file_id}`;
                     let slideHtml = `<div class="slide-item">`;
+                    // ✨ iOS အဆင်ပြေစေရန် webkit-playsinline နှင့် preload ပါဝင်အောင် ပြင်ဆင်ထားပါသည်
                     if (m.type === 'video') {
-                        slideHtml += `<video src="${mediaUrl}" loop autoplay muted playsinline controls class="zoomable-target bg-black"></video>`;
+                        slideHtml += `<video src="${mediaUrl}" loop autoplay muted playsinline webkit-playsinline preload="auto" class="zoomable-target bg-black pointer-events-none w-full h-full object-contain"></video>`;
                     } else {
                         slideHtml += `<img src="${mediaUrl}" class="zoomable-target" alt="fashion-item">`;
                     }
@@ -395,7 +395,7 @@
             if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
         }
 
-        // 🗑️ Remove Item from Cart Function (New Feature)
+        // 🗑️ Remove Item from Cart Function
         function removeFromCart(id) {
             cart = cart.filter(item => item.id !== id);
             updateCartUI();
@@ -426,7 +426,6 @@
                     </div>`;
             });
             
-            // ✅ Emerald Gradient "Confirm Order" Button injected inside Cart Container
             cartItemsContainer.innerHTML += `
                 <button onclick="sendOrderToBot()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white py-3.5 rounded-2xl font-bold active:scale-95 transition-all text-xs uppercase tracking-widest mt-4 shadow-md shadow-emerald-200">
                     ✅ အော်ဒါတင်မည် (Confirm Order)
@@ -500,17 +499,22 @@
                 }
             }, { passive: false });
 
+            // ✨ ပြင်ဆင်ပြီး - Touchend ဖြစ်လျှင် isSwiping ကို ခြွင်းချက်မရှိ အမြဲ Reset လုပ်ရန် ပြောင်းလဲထားပါသည်
             container.addEventListener('touchend', (e) => {
                 const activeMedia = track.children[currentSlideIndex].querySelector('.zoomable-target');
-                if (isSwiping && scale === 1) {
-                    isSwiping = false;
-                    let diffX = currentX - startX; let minSwipeThreshold = 45; 
-                    track.style.transition = 'transform 0.28s cubic-bezier(0.16, 1, 0.3, 1)';
-                    if (diffX < -minSwipeThreshold && currentSlideIndex < totalSlidesCount - 1) { currentSlideIndex++; } 
-                    else if (diffX > minSwipeThreshold && currentSlideIndex > 0) { currentSlideIndex--; }
-                    track.style.transform = `translateX(${-currentSlideIndex * container.offsetWidth}px)`;
-                    document.getElementById('slide-index-counter').innerText = `${currentSlideIndex + 1}/${totalSlidesCount}`;
+                
+                if (isSwiping) {
+                    isSwiping = false; 
+                    if (scale === 1) {
+                        let diffX = currentX - startX; let minSwipeThreshold = 45; 
+                        track.style.transition = 'transform 0.28s cubic-bezier(0.16, 1, 0.3, 1)';
+                        if (diffX < -minSwipeThreshold && currentSlideIndex < totalSlidesCount - 1) { currentSlideIndex++; } 
+                        else if (diffX > minSwipeThreshold && currentSlideIndex > 0) { currentSlideIndex--; }
+                        track.style.transform = `translateX(${-currentSlideIndex * container.offsetWidth}px)`;
+                        document.getElementById('slide-index-counter').innerText = `${currentSlideIndex + 1}/${totalSlidesCount}`;
+                    }
                 }
+                
                 if (e.touches.length === 0) {
                     isZooming = false;
                     if (scale <= 1.08) {
@@ -518,6 +522,12 @@
                         if(activeMedia) activeMedia.style.transform = `translate(0px, 0px) scale(1)`;
                     }
                 }
+            });
+
+            container.addEventListener('touchcancel', () => {
+                isSwiping = false; isZooming = false;
+                track.style.transition = 'transform 0.28s cubic-bezier(0.16, 1, 0.3, 1)';
+                track.style.transform = `translateX(${-currentSlideIndex * container.offsetWidth}px)`;
             });
         }
 
