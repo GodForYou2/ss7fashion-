@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-    <title>S&S7 Fashion - Pink Luxury Hub</title>
+    <title>S&S7 Fashion - High Performance Hub</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
@@ -18,7 +18,7 @@
         .luxury-glow { box-shadow: 0 8px 25px -5px rgba(236, 72, 153, 0.35); }
         .glass-blur { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px); }
 
-        /* ✨ PINK LUXURY HOVER & TOUCH ANIMATION FOR MENU LIST */
+        /* ✨ PINK LUXURY HOVER ANIMATION */
         .luxury-card {
             background: #ffffff;
             border: 1px solid rgba(244, 63, 94, 0.08);
@@ -26,8 +26,6 @@
             overflow: hidden;
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-
-        /* Hover Glow & Lift */
         @media (hover: hover) {
             .luxury-card:hover {
                 transform: translateY(-5px) scale(1.015);
@@ -38,62 +36,21 @@
                 transform: translateX(5px);
                 color: #f43f5e;
             }
-            /* Shimmer Light Reflection on Hover */
             .luxury-card::after {
-                content: '';
-                position: absolute;
-                top: 0; left: -150%;
-                width: 50%; height: 100%;
+                content: ''; position: absolute; top: 0; left: -150%; width: 50%; height: 100%;
                 background: linear-gradient(to right, transparent, rgba(255, 192, 203, 0.4), transparent);
-                transform: skewX(-25deg);
-                transition: 0.75s;
+                transform: skewX(-25deg); transition: 0.75s;
             }
-            .luxury-card:hover::after {
-                left: 150%;
-            }
+            .luxury-card:hover::after { left: 150%; }
         }
-
-        /* Mobile Touch Response (Active State) */
         .luxury-card:active {
-            transform: scale(0.97);
-            background-color: #fff1f2;
-            border-color: #ec4899;
-            box-shadow: 0 4px 10px rgba(244, 63, 94, 0.1);
+            transform: scale(0.97); background-color: #fff1f2; border-color: #ec4899;
         }
 
-        .slider-container {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            touch-action: none;
-        }
-        .slider-track {
-            display: flex;
-            width: 100%;
-            height: 100%;
-            will-change: transform;
-            transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .slide-item {
-            flex: 0 0 100%;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            position: relative;
-        }
-        .zoomable-target {
-            max-width: 100%;
-            max-height: 42vh;
-            object-fit: contain;
-            border-radius: 1.5rem;
-            will-change: transform;
-            transform-origin: center center;
-            transition: transform 0.1s ease-out;
-        }
+        .slider-container { position: relative; width: 100%; height: 100%; overflow: hidden; touch-action: none; }
+        .slider-track { display: flex; width: 100%; height: 100%; will-change: transform; transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1); }
+        .slide-item { flex: 0 0 100%; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; }
+        .zoomable-target { max-width: 100%; max-height: 42vh; object-fit: contain; border-radius: 1.5rem; will-change: transform; transform-origin: center center; transition: transform 0.1s ease-out; }
     </style>
 </head>
 <body class="p-4 min-h-screen text-slate-800 pb-24">
@@ -132,26 +89,26 @@
             <h2 id="current-sub-title" class="text-xs font-black text-white luxury-gradient px-3 py-2 rounded-xl tracking-wider uppercase luxury-glow">---</h2>
         </div>
         <div id="shop-container" class="grid grid-cols-2 gap-3"></div>
+        
+        <div id="lazy-loading-trigger" class="text-center text-rose-400 text-xs py-5 hidden font-medium animate-pulse">
+            🌸 ပစ္စည်းအသစ်များ ထပ်မံဆွဲတင်နေပါသည်...
+        </div>
     </div>
 
     <div id="detail-modal" class="hidden fixed inset-0 bg-black/85 z-50 flex items-end justify-center transition-all duration-300">
         <div class="bg-white w-full max-w-md rounded-t-[2.5rem] shadow-2xl max-h-[85vh] relative border-t border-rose-50 flex flex-col overflow-hidden">
-            
             <div class="absolute top-4 right-4 z-50">
                 <button onclick="closeDetailModal()" class="w-8 h-8 bg-black/40 backdrop-blur-md text-white rounded-full text-lg font-bold flex items-center justify-center active:scale-90 shadow-md">&times;</button>
             </div>
-
             <div class="relative w-full h-[42vh] bg-slate-950 rounded-t-[2.5rem] overflow-hidden flex-shrink-0">
                 <div id="touch-slider-box" class="slider-container">
                     <div id="detail-media-slider" class="slider-track"></div>
                 </div>
-                
                 <div class="absolute bottom-3 left-3 right-3 flex justify-between items-center px-3 py-1.5 bg-black/60 rounded-xl backdrop-blur-md pointer-events-none">
-                    <span id="swipe-badge" class="text-white text-[9px] font-bold tracking-widest uppercase animate-pulse">↔ တစ်ပုံချင်းစီ ပွတ်ဆွဲကြည့်ပါ</span>
+                    <span id="swipe-badge" class="text-white text-[9px] font-bold tracking-widest uppercase">↔ တစ်ပုံချင်းစီ ပွတ်ဆွဲကြည့်ပါ</span>
                     <span id="slide-index-counter" class="text-white text-[9px] font-mono">1/1</span>
                 </div>
             </div>
-
             <div class="p-5 bg-white flex-1 flex flex-col justify-between overflow-y-auto max-h-[43vh] no-scrollbar">
                 <div class="space-y-3">
                     <div>
@@ -162,7 +119,6 @@
                         <p id="detail-desc" class="text-[11px] text-slate-600 leading-relaxed whitespace-pre-line tracking-wide">Description...</p>
                     </div>
                 </div>
-
                 <div class="mt-4 pt-1">
                     <button id="detail-add-btn" class="w-full luxury-gradient text-white py-3 rounded-xl font-bold tracking-widest luxury-glow active:scale-98 transition-all text-xs uppercase flex items-center justify-center gap-2">
                         🛍️ ခြင်းတောင်းထဲထည့်မည်
@@ -189,6 +145,12 @@
         const API_URL = "https://myshop-1833.onrender.com"; 
         let allProducts = [], allCategories = [], cart = [];
         
+        // 🔮 Lazy Loading State Controls
+        let filteredProducts = [];
+        let itemsToShow = 20;
+        let currentLoadedCount = 0;
+        let isViewActive = false;
+
         let tg = window.Telegram.WebApp;
         tg.ready(); tg.expand();
 
@@ -207,14 +169,13 @@
                 allProducts = await prodResponse.json();
                 allProducts.sort((a, b) => (b._id || '').toString().localeCompare((a._id || '').toString()));
             } catch (error) {
-                document.getElementById('root-loading').innerText = "⚠️ ဆာဗာချိတ်ဆက်မှု မရရှိပါ";
+                document.getElementById('root-loading').innerText = "⚠️ ဆာဗာချက်ဆက်မှု မရရှိပါ";
                 return;
             }
             document.getElementById('root-loading').classList.add('hidden');
             renderRootCategories();
         }
 
-        // 🌟 LUXURY ANIMATED ROOT CARD RENDERING
         function renderRootCategories() {
             const grid = document.getElementById('root-cards-grid');
             grid.innerHTML = '';
@@ -232,7 +193,6 @@
             });
         }
 
-        // 🌟 LUXURY ANIMATED SUB CARD RENDERING
         function openSubMenu(rootId, rootName) {
             const grid = document.getElementById('sub-cards-grid');
             grid.innerHTML = '';
@@ -263,50 +223,91 @@
             const container = document.getElementById('shop-container');
             container.innerHTML = '';
 
-            let filtered = allProducts.filter(p => {
+            // Filter Active Scope Array
+            filteredProducts = allProducts.filter(p => {
                 const pCatId = p.category_id || p.category;
                 return pCatId && pCatId.toString().trim().toLowerCase() === subId.toString().trim().toLowerCase();
             });
 
-            if (filtered.length === 0) {
+            currentLoadedCount = 0; 
+            isViewActive = true;
+
+            if (filteredProducts.length === 0) {
                 container.innerHTML = `<div class="col-span-2 text-center text-slate-400 my-8 text-xs bg-white p-6 rounded-2xl border border-rose-50">အထည်များ မရှိသေးပါရှင်။</div>`;
             } else {
-                filtered.forEach(p => {
-                    let imageUrl = 'https://placehold.co/400x500?text=S%26S7+Fashion';
-                    let isVideo = false;
-
-                    if (p.colors?.[0]?.media?.[0]?.file_id) {
-                        imageUrl = `${API_URL}/api/image/${p.colors[0].media[0].file_id}`;
-                        isVideo = p.colors[0].media[0].type === 'video';
-                    } else if (p.file_id) {
-                        imageUrl = `${API_URL}/api/image/${p.file_id}`;
-                        isVideo = p.type === 'video';
-                    }
-
-                    const mediaTag = isVideo 
-                        ? `<div class="relative w-full h-44 overflow-hidden bg-slate-900 flex items-center justify-center"><video src="${imageUrl}" muted loop autoplay playsinline class="w-full h-full object-cover pointer-events-none"></video></div>`
-                        : `<img src="${imageUrl}" class="w-full h-44 object-cover bg-slate-50">`;
-
-                    container.innerHTML += `
-                        <div onclick="openDetailModal('${p._id}')" class="bg-white border border-rose-50/60 rounded-2xl overflow-hidden flex flex-col justify-between cursor-pointer p-2 shadow-2xs hover:shadow-md hover:border-rose-200 transition-all active:scale-98">
-                            <div class="overflow-hidden rounded-xl relative">${mediaTag}</div>
-                            <div class="pt-2 px-1 pb-1">
-                                <h3 class="font-bold text-[11px] text-slate-800 line-clamp-1">${p.name || 'Untitled'}</h3>
-                                <p class="text-[9px] text-rose-500 font-bold mt-0.5 tracking-wider uppercase">ကြည့်ရှုရန် ✨</p>
-                            </div>
-                        </div>`;
-                });
+                appendNextBatch(); // Load initial first 20 batch
             }
+
             document.getElementById('sub-menu-view').classList.add('hidden');
             document.getElementById('product-view').classList.remove('hidden');
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
+        // 🔥 HIGH PERFORMANCE STREAMING / LAZY INJECTION ENGINE
+        function appendNextBatch() {
+            if (!isViewActive) return;
+            const container = document.getElementById('shop-container');
+            const nextBatch = filteredProducts.slice(currentLoadedCount, currentLoadedCount + itemsToShow);
+            
+            if (nextBatch.length === 0) return;
+
+            nextBatch.forEach(p => {
+                let imageUrl = 'https://placehold.co/400x500?text=S%26S7+Fashion';
+                let isVideo = false;
+
+                if (p.colors?.[0]?.media?.[0]?.file_id) {
+                    imageUrl = `${API_URL}/api/image/${p.colors[0].media[0].file_id}`;
+                    isVideo = p.colors[0].media[0].type === 'video';
+                } else if (p.file_id) {
+                    imageUrl = `${API_URL}/api/image/${p.file_id}`;
+                    isVideo = p.type === 'video';
+                }
+
+                const mediaTag = isVideo 
+                    ? `<div class="relative w-full h-44 overflow-hidden bg-slate-900 flex items-center justify-center"><video src="${imageUrl}" muted loop autoplay playsinline class="w-full h-full object-cover pointer-events-none"></video></div>`
+                    : `<img src="${imageUrl}" class="w-full h-44 object-cover bg-slate-50" loading="lazy">`; // Native framework image optimizer
+
+                container.innerHTML += `
+                    <div onclick="openDetailModal('${p._id}')" class="bg-white border border-rose-50/60 rounded-2xl overflow-hidden flex flex-col justify-between cursor-pointer p-2 shadow-2xs hover:shadow-md hover:border-rose-200 transition-all active:scale-98">
+                        <div class="overflow-hidden rounded-xl relative">${mediaTag}</div>
+                        <div class="pt-2 px-1 pb-1">
+                            <h3 class="font-bold text-[11px] text-slate-800 line-clamp-1">${p.name || 'Untitled'}</h3>
+                            <p class="text-[9px] text-rose-500 font-bold mt-0.5 tracking-wider uppercase">ကြည့်ရှုရန် ✨</p>
+                        </div>
+                    </div>`;
+            });
+
+            currentLoadedCount += nextBatch.length;
+            toggleLoadingIndicator();
+        }
+
+        function toggleLoadingIndicator() {
+            const indicator = document.getElementById('lazy-loading-trigger');
+            if (currentLoadedCount < filteredProducts.length) {
+                indicator.classList.remove('hidden');
+            } else {
+                indicator.classList.add('hidden');
+            }
+        }
+
+        // 🌟 Automatic Page Scroll Listener for Infinite Scroll
+        window.addEventListener('scroll', () => {
+            if (!isViewActive) return;
+            // Trigger load when viewport hits 120px close to the bottom profile boundary
+            if ((window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight - 120) {
+                if (currentLoadedCount < filteredProducts.length) {
+                    appendNextBatch();
+                }
+            }
+        });
+
         function backToRootMenu() {
+            isViewActive = false;
             document.getElementById('sub-menu-view').classList.add('hidden');
             document.getElementById('root-menu-view').classList.remove('hidden');
         }
         function backToSubMenu() {
+            isViewActive = false;
             document.getElementById('product-view').classList.add('hidden');
             document.getElementById('sub-menu-view').classList.remove('hidden');
         }
@@ -378,26 +379,17 @@
 
             container.addEventListener('touchstart', (e) => {
                 if (e.touches.length === 2) {
-                    isZooming = true;
-                    isSwiping = false;
-                    startDist = Math.hypot(
-                        e.touches[0].clientX - e.touches[1].clientX,
-                        e.touches[0].clientY - e.touches[1].clientY
-                    );
+                    isZooming = true; isSwiping = false;
+                    startDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
                     initialScale = scale;
                 } else if (e.touches.length === 1) {
                     if (scale > 1) {
-                        isZooming = true;
-                        isSwiping = false;
-                        startPanX = e.touches[0].clientX - panX;
-                        startPanY = e.touches[0].clientY - panY;
+                        isZooming = true; isSwiping = false;
+                        startPanX = e.touches[0].clientX - panX; startPanY = e.touches[0].clientY - panY;
                     } else {
-                        isSwiping = true;
-                        isZooming = false;
-                        startX = e.touches[0].clientX;
-                        startY = e.touches[0].clientY;
-                        currentX = startX;
-                        track.style.transition = 'none'; 
+                        isSwiping = true; isZooming = false;
+                        startX = e.touches[0].clientX; startY = e.touches[0].clientY;
+                        currentX = startX; track.style.transition = 'none'; 
                     }
                 }
             }, { passive: false });
@@ -407,33 +399,23 @@
 
                 if (isZooming && e.touches.length === 2) {
                     e.preventDefault();
-                    const currentDist = Math.hypot(
-                        e.touches[0].clientX - e.touches[1].clientX,
-                        e.touches[0].clientY - e.touches[1].clientY
-                    );
+                    const currentDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
                     scale = (currentDist / startDist) * initialScale;
-                    if (scale < 1) scale = 1;
-                    if (scale > 4) scale = 4;
-                    
+                    if (scale < 1) scale = 1; if (scale > 4) scale = 4;
                     if (scale === 1) { panX = 0; panY = 0; }
                     if (activeMedia) activeMedia.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
                 } 
                 else if (isZooming && e.touches.length === 1 && scale > 1) {
                     e.preventDefault();
-                    panX = e.touches[0].clientX - startPanX;
-                    panY = e.touches[0].clientY - startPanY;
-                    
+                    panX = e.touches[0].clientX - startPanX; panY = e.touches[0].clientY - startPanY;
                     const limit = (scale - 1) * 80;
                     if (panX > limit) panX = limit; if (panX < -limit) panX = -limit;
                     if (panY > limit) panY = limit; if (panY < -limit) panY = -limit;
-                    
                     if (activeMedia) activeMedia.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
                 } 
                 else if (isSwiping && e.touches.length === 1 && scale === 1) {
                     currentX = e.touches[0].clientX;
-                    let diffX = currentX - startX;
-                    let diffY = e.touches[0].clientY - startY;
-
+                    let diffX = currentX - startX; let diffY = e.touches[0].clientY - startY;
                     if (Math.abs(diffX) > Math.abs(diffY)) {
                         e.preventDefault();
                         let baseTranslate = -currentSlideIndex * container.offsetWidth;
@@ -444,24 +426,15 @@
 
             container.addEventListener('touchend', (e) => {
                 const activeMedia = track.children[currentSlideIndex].querySelector('.zoomable-target');
-
                 if (isSwiping && scale === 1) {
                     isSwiping = false;
-                    let diffX = currentX - startX;
-                    let minSwipeThreshold = 45; 
-
+                    let diffX = currentX - startX; let minSwipeThreshold = 45; 
                     track.style.transition = 'transform 0.28s cubic-bezier(0.16, 1, 0.3, 1)';
-                    
-                    if (diffX < -minSwipeThreshold && currentSlideIndex < totalSlidesCount - 1) {
-                        currentSlideIndex++; 
-                    } else if (diffX > minSwipeThreshold && currentSlideIndex > 0) {
-                        currentSlideIndex--; 
-                    }
-                    
+                    if (diffX < -minSwipeThreshold && currentSlideIndex < totalSlidesCount - 1) { currentSlideIndex++; } 
+                    else if (diffX > minSwipeThreshold && currentSlideIndex > 0) { currentSlideIndex--; }
                     track.style.transform = `translateX(${-currentSlideIndex * container.offsetWidth}px)`;
                     document.getElementById('slide-index-counter').innerText = `${currentSlideIndex + 1}/${totalSlidesCount}`;
                 }
-
                 if (e.touches.length === 0) {
                     isZooming = false;
                     if (scale <= 1.08) {
@@ -480,9 +453,7 @@
         function addToCart(id, name) {
             let item = cart.find(x => x.id === id);
             if (item) { item.qty++; } else { cart.push({ id, name, qty: 1 }); }
-            updateCartUI();
-            closeDetailModal();
-            toggleCartModal();
+            updateCartUI(); closeDetailModal(); toggleCartModal();
             if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
         }
 
@@ -490,12 +461,10 @@
             document.getElementById('cart-count').innerText = cart.reduce((sum, item) => sum + item.qty, 0);
             const cartItemsContainer = document.getElementById('cart-items');
             cartItemsContainer.innerHTML = '';
-            
             if (cart.length === 0) {
                 cartItemsContainer.innerHTML = `<p class="text-center text-xs text-slate-400 py-12">ခြင်းတောင်းထဲမှာ အထည်မရှိသေးပါရှင် 💖</p>`;
                 return;
             }
-
             cart.forEach(item => {
                 cartItemsContainer.innerHTML += `
                     <div class="flex justify-between items-center bg-rose-50/40 p-4 rounded-2xl border border-rose-100/40">
@@ -505,9 +474,7 @@
             });
         }
 
-        function toggleCartModal() {
-            document.getElementById('cart-modal').classList.toggle('hidden');
-        }
+        function toggleCartModal() { document.getElementById('cart-modal').classList.toggle('hidden'); }
 
         loadShopData();
     </script>
