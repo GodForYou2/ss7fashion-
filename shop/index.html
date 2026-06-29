@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-    <title>S&S7 Fashion - High Performance Hub</title>
+    <title>S&S7 Fashion - Premium Luxury Hub</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
@@ -18,7 +18,7 @@
         .luxury-glow { box-shadow: 0 8px 25px -5px rgba(236, 72, 153, 0.35); }
         .glass-blur { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px); }
 
-        /* ✨ PINK LUXURY HOVER ANIMATION */
+        /* ✨ Luxury Card Styles with Animations */
         .luxury-card {
             background: #ffffff;
             border: 1px solid rgba(244, 63, 94, 0.08);
@@ -47,6 +47,7 @@
             transform: scale(0.97); background-color: #fff1f2; border-color: #ec4899;
         }
 
+        /* 🖼️ Slider Styles */
         .slider-container { position: relative; width: 100%; height: 100%; overflow: hidden; touch-action: none; }
         .slider-track { display: flex; width: 100%; height: 100%; will-change: transform; transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1); }
         .slide-item { flex: 0 0 100%; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; }
@@ -129,14 +130,16 @@
     </div>
 
     <div id="cart-modal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-end justify-center">
-        <div class="bg-white w-full max-w-md rounded-t-[2.5rem] p-6 shadow-2xl max-h-[80vh] overflow-y-auto">
-            <div class="flex justify-between items-center mb-5 border-b border-rose-50 pb-3">
+        <div class="bg-white w-full max-w-md rounded-t-[2.5rem] p-6 shadow-2xl max-h-[80vh] flex flex-col justify-between">
+            <div class="flex justify-between items-center mb-5 border-b border-rose-50 pb-3 flex-shrink-0">
                 <h2 class="text-xs font-black tracking-wider uppercase text-slate-800">🛍️ ရွေးချယ်ထားသော အထည်များ</h2>
                 <button onclick="toggleCartModal()" class="text-slate-400 text-2xl font-bold active:scale-90">&times;</button>
             </div>
-            <div id="cart-items" class="space-y-3 max-h-[48vh] overflow-y-auto pr-1 no-scrollbar"></div>
-            <div class="border-t border-rose-50 mt-5 pt-4">
-                <button onclick="toggleCartModal()" class="w-full luxury-gradient text-white py-3.5 rounded-2xl font-bold luxury-glow active:scale-95 transition-all text-xs uppercase tracking-widest">✨ ပစ္စည်း ထပ်ကြည့်မည်</button>
+            <div id="cart-items" class="space-y-3 overflow-y-auto pr-1 no-scrollbar flex-1 max-h-[48vh]"></div>
+            <div class="border-t border-rose-50 mt-5 pt-4 flex-shrink-0">
+                <button onclick="toggleCartModal()" class="w-full luxury-gradient text-white py-3.5 rounded-2xl font-bold luxury-glow active:scale-95 transition-all text-xs uppercase tracking-widest">
+                    ✨ ပစ္စည်း ထပ်ကြည့်မည်
+                </button>
             </div>
         </div>
     </div>
@@ -145,7 +148,6 @@
         const API_URL = "https://myshop-1833.onrender.com"; 
         let allProducts = [], allCategories = [], cart = [];
         
-        // 🔮 Lazy Loading State Controls
         let filteredProducts = [];
         let itemsToShow = 20;
         let currentLoadedCount = 0;
@@ -158,6 +160,7 @@
             document.getElementById('user-greeting').innerText = `မင်္ဂလာပါ ${tg.initDataUnsafe.user.first_name} ✨`;
         }
 
+        // 📥 Load Data from Backend
         async function loadShopData() {
             try {
                 const catResponse = await fetch(`${API_URL}/api/categories`);
@@ -169,13 +172,14 @@
                 allProducts = await prodResponse.json();
                 allProducts.sort((a, b) => (b._id || '').toString().localeCompare((a._id || '').toString()));
             } catch (error) {
-                document.getElementById('root-loading').innerText = "⚠️ ဆာဗာချက်ဆက်မှု မရရှိပါ";
+                document.getElementById('root-loading').innerText = "⚠️ ဆာဗာချိတ်ဆက်မှု မရရှိပါ";
                 return;
             }
             document.getElementById('root-loading').classList.add('hidden');
             renderRootCategories();
         }
 
+        // 🏷️ Render Root Categories
         function renderRootCategories() {
             const grid = document.getElementById('root-cards-grid');
             grid.innerHTML = '';
@@ -193,6 +197,7 @@
             });
         }
 
+        // 🏷️ Open Sub Categories View
         function openSubMenu(rootId, rootName) {
             const grid = document.getElementById('sub-cards-grid');
             grid.innerHTML = '';
@@ -218,12 +223,12 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
+        // 👗 Select SubCategory & Prepare Lazy Loading
         function selectSubCategory(subId, subName) {
             document.getElementById('current-sub-title').innerText = subName;
             const container = document.getElementById('shop-container');
             container.innerHTML = '';
 
-            // Filter Active Scope Array
             filteredProducts = allProducts.filter(p => {
                 const pCatId = p.category_id || p.category;
                 return pCatId && pCatId.toString().trim().toLowerCase() === subId.toString().trim().toLowerCase();
@@ -235,7 +240,7 @@
             if (filteredProducts.length === 0) {
                 container.innerHTML = `<div class="col-span-2 text-center text-slate-400 my-8 text-xs bg-white p-6 rounded-2xl border border-rose-50">အထည်များ မရှိသေးပါရှင်။</div>`;
             } else {
-                appendNextBatch(); // Load initial first 20 batch
+                appendNextBatch();
             }
 
             document.getElementById('sub-menu-view').classList.add('hidden');
@@ -243,7 +248,7 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // 🔥 HIGH PERFORMANCE STREAMING / LAZY INJECTION ENGINE
+        // 🚀 Lazy Loading Engine (Append Batch Products)
         function appendNextBatch() {
             if (!isViewActive) return;
             const container = document.getElementById('shop-container');
@@ -265,7 +270,7 @@
 
                 const mediaTag = isVideo 
                     ? `<div class="relative w-full h-44 overflow-hidden bg-slate-900 flex items-center justify-center"><video src="${imageUrl}" muted loop autoplay playsinline class="w-full h-full object-cover pointer-events-none"></video></div>`
-                    : `<img src="${imageUrl}" class="w-full h-44 object-cover bg-slate-50" loading="lazy">`; // Native framework image optimizer
+                    : `<img src="${imageUrl}" class="w-full h-44 object-cover bg-slate-50" loading="lazy">`;
 
                 container.innerHTML += `
                     <div onclick="openDetailModal('${p._id}')" class="bg-white border border-rose-50/60 rounded-2xl overflow-hidden flex flex-col justify-between cursor-pointer p-2 shadow-2xs hover:shadow-md hover:border-rose-200 transition-all active:scale-98">
@@ -290,10 +295,9 @@
             }
         }
 
-        // 🌟 Automatic Page Scroll Listener for Infinite Scroll
+        // Scroll Event Listener for Infinite Scroll
         window.addEventListener('scroll', () => {
             if (!isViewActive) return;
-            // Trigger load when viewport hits 120px close to the bottom profile boundary
             if ((window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight - 120) {
                 if (currentLoadedCount < filteredProducts.length) {
                     appendNextBatch();
@@ -301,6 +305,7 @@
             }
         });
 
+        // Navigation Controllers
         function backToRootMenu() {
             isViewActive = false;
             document.getElementById('sub-menu-view').classList.add('hidden');
@@ -312,17 +317,18 @@
             document.getElementById('sub-menu-view').classList.remove('hidden');
         }
 
-        // 🌟 ONE SLIDE AT A TIME PRECISION TOUCH ENGINE
         let currentSlideIndex = 0;
         let totalSlidesCount = 0;
 
+        // 🔍 Open Detail Modal & Sync file_id
         function openDetailModal(productId) {
             const product = allProducts.find(p => p._id === productId);
             if (!product) return;
 
             document.getElementById('detail-title').innerText = product.name || 'Untitled';
             document.getElementById('detail-desc').innerText = product.description || 'အညွှန်း မရှိပါ။';
-            // အထည်ရဲ့ file_id ကိုပါ ခလုတ်ထဲ ထည့်ပေးလိုက်တာပါ 💡
+            
+            // 💡 Extract Active file_id for Hyperlink System
             const activeFileId = product.colors?.[0]?.media?.[0]?.file_id || product.file_id || "";
             document.getElementById('detail-add-btn').setAttribute('onclick', `addToCart('${product._id}', '${product.name || "Premium Item"}', '${activeFileId}')`);
 
@@ -369,13 +375,81 @@
             if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
         }
 
+        // 🛍️ Add to Cart Action with file_id Injection
+        function addToCart(id, name, fileId) {
+            let item = cart.find(x => x.id === id);
+            if (item) { 
+                item.qty++; 
+            } else { 
+                cart.push({ 
+                    id, 
+                    name, 
+                    qty: 1, 
+                    file_id: fileId || null 
+                }); 
+            }
+            updateCartUI(); 
+            closeDetailModal(); 
+            toggleCartModal();
+            if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
+        }
+
+        // 🗑️ Remove Item from Cart Function (New Feature)
+        function removeFromCart(id) {
+            cart = cart.filter(item => item.id !== id);
+            updateCartUI();
+            if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+        }
+
+        // 🛒 Render Cart UI dynamically
+        function updateCartUI() {
+            document.getElementById('cart-count').innerText = cart.reduce((sum, item) => sum + item.qty, 0);
+            const cartItemsContainer = document.getElementById('cart-items');
+            cartItemsContainer.innerHTML = '';
+            
+            if (cart.length === 0) {
+                cartItemsContainer.innerHTML = `<p class="text-center text-xs text-slate-400 py-12">ခြင်းတောင်းထဲမှာ အထည်မရှိသေးပါရှင် 💖</p>`;
+                return;
+            }
+            
+            cart.forEach(item => {
+                cartItemsContainer.innerHTML += `
+                    <div class="flex justify-between items-center bg-rose-50/40 p-4 rounded-2xl border border-rose-100/40">
+                        <div>
+                            <p class="font-bold text-xs text-slate-700">✨ ${item.name}</p>
+                            <span class="text-[10px] text-slate-400">အရေအတွက်: ${item.qty} ထည်</span>
+                        </div>
+                        <button onclick="removeFromCart('${item.id}')" class="text-rose-500 bg-rose-50 hover:bg-rose-100 p-2 rounded-xl text-xs active:scale-90 transition-all border border-rose-100">
+                            🗑️ ဖျက်မယ်
+                        </button>
+                    </div>`;
+            });
+            
+            // ✅ Emerald Gradient "Confirm Order" Button injected inside Cart Container
+            cartItemsContainer.innerHTML += `
+                <button onclick="sendOrderToBot()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white py-3.5 rounded-2xl font-bold active:scale-95 transition-all text-xs uppercase tracking-widest mt-4 shadow-md shadow-emerald-200">
+                    ✅ အော်ဒါတင်မည် (Confirm Order)
+                </button>
+            `;
+        }
+
+        // 🚀 Send Data Back to Telegram Bot
+        function sendOrderToBot() {
+            if (cart.length === 0) return;
+            const orderData = {
+                action: "NEW_ORDER",
+                items: cart
+            };
+            tg.sendData(JSON.stringify(orderData));
+            tg.close();
+        }
+
+        // 🎛️ Touch Gesture Engine (Swipe & Zoom Controls)
         function initPrecisionTouchEngine() {
             const container = document.getElementById('touch-slider-box');
             const track = document.getElementById('detail-media-slider');
-            
             let startX = 0, startY = 0, currentX = 0;
             let isSwiping = false, isZooming = false;
-            
             let scale = 1, startDist = 0, initialScale = 1;
             let panX = 0, panY = 0, startPanX = 0, startPanY = 0;
 
@@ -398,7 +472,6 @@
 
             container.addEventListener('touchmove', (e) => {
                 const activeMedia = track.children[currentSlideIndex].querySelector('.zoomable-target');
-
                 if (isZooming && e.touches.length === 2) {
                     e.preventDefault();
                     const currentDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
@@ -452,41 +525,9 @@
             document.getElementById('detail-media-slider').innerHTML = '';
         }
 
-        function addToCart(id, name, fileId) {
-            let item = cart.find(x => x.id === id);
-            if (item) { 
-        item.qty++; 
-            } else { 
-        cart.push({ 
-            id, 
-            name, 
-            qty: 1, 
-            file_id: fileId || null 
-        }); 
-    }
-            updateCartUI(); closeDetailModal(); toggleCartModal();
-            if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
-        }
-
-        function updateCartUI() {
-            document.getElementById('cart-count').innerText = cart.reduce((sum, item) => sum + item.qty, 0);
-            const cartItemsContainer = document.getElementById('cart-items');
-            cartItemsContainer.innerHTML = '';
-            if (cart.length === 0) {
-                cartItemsContainer.innerHTML = `<p class="text-center text-xs text-slate-400 py-12">ခြင်းတောင်းထဲမှာ အထည်မရှိသေးပါရှင် 💖</p>`;
-                return;
-            }
-            cart.forEach(item => {
-                cartItemsContainer.innerHTML += `
-                    <div class="flex justify-between items-center bg-rose-50/40 p-4 rounded-2xl border border-rose-100/40">
-                        <p class="font-bold text-xs text-slate-700">✨ ${item.name}</p>
-                        <span class="luxury-gradient text-white px-3 py-1 rounded-xl text-[10px] font-black">QTY: ${item.qty}</span>
-                    </div>`;
-            });
-        }
-
         function toggleCartModal() { document.getElementById('cart-modal').classList.toggle('hidden'); }
 
+        // Start Application Engine
         loadShopData();
     </script>
 </body>
