@@ -18,25 +18,26 @@
         .luxury-glow { box-shadow: 0 10px 25px -5px rgba(236, 72, 153, 0.35); }
         .glass-blur { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px); }
         
-        /* Native-like Zoom Wrapper */
+        /* Smooth Touch Zoom Container */
         .zoom-container {
-            overflow: visible;
+            overflow: hidden;
             width: 100%;
             height: 100%;
             display: flex;
             align-items: center;
             justify-content: center;
-            touch-action: none; /* Browser ရဲ့ default scroll ကိုပိတ်ပြီး လက်နှစ်ချောင်းဆွဲတာပဲ လက်ခံမယ် */
+            touch-action: none;
+            position: relative;
         }
         .zoomable-media {
             user-select: none;
             -webkit-user-drag: none;
-            max-height: 40vh;
+            max-height: 42vh;
             object-fit: contain;
             width: 100%;
             height: 100%;
             will-change: transform;
-            transition: transform 0.1s ease-out; /* ပွတ်ဆွဲရတာ ချောမွေ့စေရန် */
+            transform-origin: center center;
         }
     </style>
 </head>
@@ -59,72 +60,80 @@
             <p class="text-xs text-slate-500 mt-1">ကြည့်ရှုလိုသော ပင်မဖက်ရှင်ကဏ္ဍတစ်ခုကို ရွေးချယ်ပေးပါရှင်။</p>
         </div>
         <div id="root-cards-grid" class="grid grid-cols-1 gap-4">
-            <p id="root-loading" class="text-center text-pink-400 font-medium my-12 text-xs animate-pulse">
-                🌸 မီနူးများကို ဖတ်ရှုနေပါသည်...
-            </p>
+            <p id="root-loading" class="text-center text-pink-400 font-medium my-12 text-xs animate-pulse">🌸 မီနူးများကို ဖတ်ရှုနေပါသည်...</p>
         </div>
     </div>
 
     <div id="sub-menu-view" class="hidden space-y-4">
         <div class="flex items-center justify-between mb-5 px-1">
-            <button onclick="backToRootMenu()" class="flex items-center gap-1.5 text-xs font-bold text-pink-500 bg-white border border-pink-100 px-3 py-2 rounded-xl active:scale-95 transition-all">
-                ← ပင်မမီနူးသို့
-            </button>
+            <button onclick="backToRootMenu()" class="flex items-center gap-1.5 text-xs font-bold text-pink-500 bg-white border border-pink-100 px-3 py-2 rounded-xl active:scale-95 transition-all">← ပင်မမီနူးသို့</button>
             <h2 class="text-xs font-black text-white luxury-gradient px-3 py-2 rounded-xl tracking-wider uppercase luxury-glow">ရွေးချယ်ထားသော ကဏ္ဍ</h2>
         </div>
-        
         <div class="mb-2 px-1">
             <h3 id="parent-menu-title" class="font-black text-sm text-slate-800 tracking-wider uppercase">---</h3>
             <p class="text-xs text-slate-500 mt-0.5">ခွဲခြားထားသော ကဏ္ဍခွဲတစ်ခုကို ထပ်မံရွေးချယ်ပါ-</p>
         </div>
-        
         <div id="sub-cards-grid" class="grid grid-cols-1 gap-4"></div>
     </div>
 
     <div id="product-view" class="hidden">
         <div class="flex items-center justify-between mb-5 px-1">
-            <button onclick="backToSubMenu()" class="flex items-center gap-1.5 text-xs font-bold text-pink-500 bg-white border border-pink-100 px-3 py-2 rounded-xl active:scale-95 transition-all">
-                ← ကဏ္ဍခွဲများသို့
-            </button>
+            <button onclick="backToSubMenu()" class="flex items-center gap-1.5 text-xs font-bold text-pink-500 bg-white border border-pink-100 px-3 py-2 rounded-xl active:scale-95 transition-all">← ကဏ္ဍခွဲများသို့</button>
             <h2 id="current-sub-title" class="text-xs font-black text-white luxury-gradient px-3 py-2 rounded-xl tracking-wider uppercase luxury-glow">---</h2>
         </div>
         <div id="shop-container" class="grid grid-cols-2 gap-4"></div>
     </div>
 
-    <div id="detail-modal" class="hidden fixed inset-0 bg-black/70 z-50 flex items-end justify-center transition-all duration-300">
-        <div class="bg-white w-full max-w-md rounded-t-[2.5rem] shadow-2xl max-h-[92vh] relative border-t border-pink-50 flex flex-col">
+    <div id="detail-modal" class="hidden fixed inset-0 bg-black/80 z-50 flex items-end justify-center transition-all duration-300">
+        <div class="bg-white w-full max-w-md rounded-t-[2.5rem] shadow-2xl max-h-[94vh] relative border-t border-pink-50 flex flex-col overflow-hidden">
             
             <div class="absolute top-4 right-4 z-50">
-                <button onclick="closeDetailModal()" class="w-8 h-8 bg-black/40 backdrop-blur-md text-white rounded-full text-base font-bold flex items-center justify-center active:scale-90">&times;</button>
+                <button onclick="closeDetailModal()" class="w-9 h-9 bg-black/50 backdrop-blur-md text-white rounded-full text-xl font-bold flex items-center justify-center active:scale-90 shadow-lg">&times;</button>
             </div>
 
-            <div class="relative w-full h-[45vh] bg-slate-950 rounded-t-[2.5rem] overflow-hidden flex-shrink-0 group">
-                <div id="detail-media-slider" class="w-full h-full flex overflow-x-auto snap-x snap-mandatory no-scrollbar items-center">
-                    </div>
-                <div class="absolute bottom-4 left-4 right-4 flex justify-between items-center px-3 py-1.5 bg-black/60 rounded-xl backdrop-blur-md">
-                    <span id="swipe-badge" class="text-white text-[9px] font-medium tracking-widest uppercase hidden">
-                        ← Swipe Gallery →
-                    </span>
-                    <span class="text-white text-[9px] font-bold tracking-wider uppercase flex items-center gap-1">
-                        👆 လက်နှစ်ချောင်းဖြင့် ပုံကို ချဲ့/ချုံ့ ကြည့်နိုင်ပါသည် (Pinch to Zoom)
-                    </span>
+            <div class="relative w-full h-[45vh] bg-slate-950 rounded-t-[2.5rem] overflow-hidden flex-shrink-0">
+                <div id="detail-media-slider" class="w-full h-full flex overflow-x-auto snap-x snap-mandatory no-scrollbar items-center"></div>
+                
+                <div class="absolute bottom-3 left-3 right-3 flex justify-between items-center px-3 py-2 bg-black/60 rounded-xl backdrop-blur-md pointer-events-none">
+                    <span id="swipe-badge" class="text-white text-[9px] font-bold tracking-widest uppercase hidden">↔ Swipe ပွတ်ဆွဲရန်</span>
+                    <span class="text-white text-[9px] font-medium tracking-wide flex items-center gap-1">👆 လက်၂ချောင်းဖြင့် ချဲ့ကြည့်နိုင်ပါသည်</span>
                 </div>
             </div>
 
-            <div class="p-6 bg-white flex-1 flex flex-col justify-between overflow-y-auto max-h-[42vh] border-t border-slate-100">
-                <div>
-                    <span class="text-[9px] font-bold uppercase tracking-widest text-pink-500 bg-pink-50 px-2.5 py-1 rounded-lg">Premium Quality</span>
-                    <h2 id="detail-title" class="text-lg font-black text-slate-800 tracking-tight leading-snug mt-2.5">Product Title</h2>
+            <div class="p-5 bg-white flex-1 flex flex-col justify-between overflow-y-auto max-h-[49vh] border-t border-slate-100 no-scrollbar">
+                <div class="space-y-4">
+                    <div>
+                        <span class="text-[9px] font-bold uppercase tracking-widest text-pink-600 bg-pink-50 px-2.5 py-1 rounded-lg border border-pink-100">အထည်အစစ်ပုံစံ</span>
+                        <h2 id="detail-title" class="text-base font-black text-slate-800 tracking-tight leading-snug mt-2">Product Title</h2>
+                    </div>
                     
-                    <div class="mt-4 border-t border-slate-100 pt-3">
-                        <p id="detail-desc" class="text-xs text-slate-600 leading-relaxed whitespace-pre-line tracking-wide">
-                            Description text...
-                        </p>
+                    <div>
+                        <p class="text-[11px] font-bold text-slate-500 mb-1.5 uppercase tracking-wider">📐 အရွယ်အစားရွေးချယ်ရန် (Size)</p>
+                        <div class="flex gap-2" id="size-container">
+                            <button onclick="selectSize(this)" class="px-3.5 py-1.5 border border-pink-200 text-xs font-bold rounded-xl text-pink-600 bg-pink-50/50 target-size active:scale-95 transition-all">S</button>
+                            <button onclick="selectSize(this)" class="px-3.5 py-1.5 border border-slate-200 text-xs font-bold rounded-xl text-slate-600 hover:border-pink-300 target-size active:scale-95 transition-all">M</button>
+                            <button onclick="selectSize(this)" class="px-3.5 py-1.5 border border-slate-200 text-xs font-bold rounded-xl text-slate-600 hover:border-pink-300 target-size active:scale-95 transition-all">L</button>
+                            <button onclick="selectSize(this)" class="px-3.5 py-1.5 border border-slate-200 text-xs font-bold rounded-xl text-slate-600 hover:border-pink-300 target-size active:scale-95 transition-all">XL</button>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between items-center bg-slate-50 p-3 rounded-2xl border border-slate-100">
+                        <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">🛍️ မှာယူမည့် အရေအတွက်</span>
+                        <div class="flex items-center gap-3 bg-white border border-slate-200 rounded-xl px-2 py-1">
+                            <button onclick="changeQty(-1)" class="w-6 h-6 text-slate-600 font-bold text-sm bg-slate-100 rounded-lg flex items-center justify-center active:scale-90">-</button>
+                            <span id="detail-qty" class="text-xs font-black text-slate-800 min-w-4 text-center">1</span>
+                            <button onclick="changeQty(1)" class="w-6 h-6 text-slate-600 font-bold text-sm bg-slate-100 rounded-lg flex items-center justify-center active:scale-90">+</button>
+                        </div>
+                    </div>
+
+                    <div class="border-t border-slate-100 pt-3">
+                        <p class="text-[11px] font-bold text-slate-400 mb-1 uppercase tracking-wider">📝 အထည်အညွှန်း</p>
+                        <p id="detail-desc" class="text-xs text-slate-600 leading-relaxed whitespace-pre-line tracking-wide">Description...</p>
                     </div>
                 </div>
 
-                <div class="mt-6 pt-4">
-                    <button id="detail-add-btn" class="w-full luxury-gradient text-white py-4 rounded-2xl font-bold tracking-widest luxury-glow active:scale-98 transition-all text-xs uppercase">
+                <div class="mt-5">
+                    <button id="detail-add-btn" class="w-full luxury-gradient text-white py-3.5 rounded-2xl font-bold tracking-widest luxury-glow active:scale-98 transition-all text-xs uppercase">
                         💖 ခြင်းတောင်းထဲထည့်မည်
                     </button>
                 </div>
@@ -138,23 +147,18 @@
                 <h2 class="text-xs font-black tracking-wider uppercase text-slate-800 flex items-center gap-2">🛍️ ရွေးချယ်ထားသော အထည်များ</h2>
                 <button onclick="toggleCartModal()" class="text-slate-400 text-2xl font-bold active:scale-90">&times;</button>
             </div>
-            
             <div id="cart-items" class="space-y-3 max-h-[48vh] overflow-y-auto pr-1 no-scrollbar"></div>
-            
             <div class="border-t border-pink-50 mt-5 pt-4">
-                <button onclick="toggleCartModal()" class="w-full luxury-gradient text-white py-3.5 rounded-2xl font-bold luxury-glow active:scale-95 transition-all text-xs uppercase tracking-widest">
-                    ✨ ပစ္စည်း ထပ်မံကြည့်ရှုမည်
-                </button>
+                <button onclick="toggleCartModal()" class="w-full luxury-gradient text-white py-3.5 rounded-2xl font-bold luxury-glow active:scale-95 transition-all text-xs uppercase tracking-widest">✨ ပစ္စည်း ထပ်မံကြည့်ရှုမည်</button>
             </div>
         </div>
     </div>
 
     <script>
         const API_URL = "https://myshop-1833.onrender.com"; 
-        
-        let allProducts = [];
-        let allCategories = [];
-        let cart = [];
+        let allProducts = [], allCategories = [], cart = [];
+        let currentSelectedSize = "S";
+        let currentDetailQty = 1;
         
         let tg = window.Telegram.WebApp;
         tg.ready(); tg.expand();
@@ -185,16 +189,14 @@
             const grid = document.getElementById('root-cards-grid');
             grid.innerHTML = '';
             const roots = allCategories.filter(c => !c.parent_id || c.parent_id === "null" || c.parent_id === "root");
-
             if(roots.length === 0) {
                 grid.innerHTML = `<p class="text-center text-slate-400 text-xs py-8 bg-white rounded-2xl border border-pink-100">ပင်မမီနူးများ မရှိသေးပါ။</p>`;
                 return;
             }
-
             roots.forEach((cat, index) => {
                 const catName = cat.name || cat.title || "Collection";
                 grid.innerHTML += `
-                    <div onclick="openSubMenu('${cat._id}', '${catName}')" class="bg-white border border-pink-100/70 rounded-2xl p-5 flex justify-between items-center cursor-pointer hover:border-pink-300 active:scale-98 transition-all shadow-2xs relative overflow-hidden group">
+                    <div onclick="openSubMenu('${cat._id}', '${catName}')" class="bg-white border border-pink-100/70 rounded-2xl p-5 flex justify-between items-center cursor-pointer hover:border-pink-300 active:scale-98 transition-all shadow-2xs group">
                         <div>
                             <span class="text-[9px] font-mono text-pink-400 block tracking-widest mb-1">0${index + 1} / ROOT MENU</span>
                             <h3 class="font-black text-sm text-slate-800 tracking-wider uppercase">${catName}</h3>
@@ -203,8 +205,7 @@
                             <span class="text-[10px] text-pink-500 font-bold tracking-widest uppercase">ဝင်မည်</span>
                             <span class="text-pink-300 group-hover:translate-x-1 transition-transform">→</span>
                         </div>
-                    </div>
-                `;
+                    </div>`;
             });
         }
 
@@ -215,12 +216,12 @@
             const subMenus = allCategories.filter(c => c.parent_id === rootId);
 
             if(subMenus.length === 0) {
-                grid.innerHTML = `<p class="text-center text-slate-400 text-xs py-8 bg-white rounded-2xl border border-pink-100">ဤကဏ္ဍတွင် ရွေးချယ်စရာ မီနူးခွဲများ မရှိသေးပါရှင်။</p>`;
+                grid.innerHTML = `<p class="text-center text-slate-400 text-xs py-8 bg-white rounded-2xl border border-pink-100">ဤကဏ္ဍတွင် မီနူးခွဲများ မရှိသေးပါရှင်။</p>`;
             } else {
-                subMenus.forEach((sub, index) => {
+                subMenus.forEach((sub) => {
                     const subName = sub.name || sub.title || "Sub Category";
                     grid.innerHTML += `
-                        <div onclick="selectSubCategory('${sub._id}', '${subName}')" class="bg-white border border-pink-100/70 rounded-2xl p-5 flex justify-between items-center cursor-pointer hover:border-pink-300 active:scale-98 transition-all shadow-2xs relative overflow-hidden group">
+                        <div onclick="selectSubCategory('${sub._id}', '${subName}')" class="bg-white border border-pink-100/70 rounded-2xl p-5 flex justify-between items-center cursor-pointer hover:border-pink-300 active:scale-98 transition-all shadow-2xs group">
                             <div>
                                 <span class="text-[9px] font-mono text-pink-400 block tracking-widest mb-1">SUB / ${rootName.toUpperCase()}</span>
                                 <h3 class="font-black text-sm text-slate-800 tracking-wider uppercase">${subName}</h3>
@@ -229,8 +230,7 @@
                                 <span class="text-[10px] text-pink-500 font-bold tracking-widest uppercase">ကြည့်မည်</span>
                                 <span class="text-pink-300 group-hover:translate-x-1 transition-transform">→</span>
                             </div>
-                        </div>
-                    `;
+                        </div>`;
                 });
             }
             document.getElementById('root-menu-view').classList.add('hidden');
@@ -246,55 +246,38 @@
             let filtered = allProducts.filter(p => {
                 const pCatId = p.category_id || p.category;
                 if (!pCatId) return false;
-                
-                const id1 = pCatId.toString().trim().toLowerCase();
-                const id2 = subId.toString().trim().toLowerCase();
-                
-                return id1 === id2;
+                return pCatId.toString().trim().toLowerCase() === subId.toString().trim().toLowerCase();
             });
 
             if (filtered.length === 0) {
-                let sampleProductCategoryIds = allProducts.slice(0, 3).map(p => p.category_id || p.category);
-                container.innerHTML = `
-                    <div class="col-span-2 text-center text-slate-400 my-8 text-xs bg-white p-6 rounded-2xl border border-pink-50">
-                        <p class="font-bold text-pink-500 mb-2">⚠️ ဤကဏ္ဍခွဲ (Sub-menu) အတွင်း ချိတ်ဆက်ထားသော ပစ္စည်းများ မရှိသေးပါရှင်။</p>
-                        <p class="text-[9px] text-slate-500">Sub-menu ID (စစ်ဆေးချက်): <code class="bg-slate-100 px-1 py-0.5 rounded">${subId}</code></p>
-                        <p class="text-[9px] text-slate-500 mt-1">ဒေတာဘေ့စ်ထဲမှ နမူနာ Category ID များ: <code class="bg-slate-100 px-1 py-0.5 rounded">${JSON.stringify(sampleProductCategoryIds)}</code></p>
-                        <p class="text-[9px] text-slate-400 mt-3">အကြံပြုချက်။ ။ MongoDB (သို့) Bot မှတဆင့် အဆိုပါ Sub-menu အောက်တွင် ပစ္စည်းအသစ်များကို အမှန်တကယ် ထည့်သွင်းထားခြင်း ရှိမရှိ စစ်ဆေးပေးပါရန်</p>
-                    </div>
-                `;
+                container.innerHTML = `<div class="col-span-2 text-center text-slate-400 my-8 text-xs bg-white p-6 rounded-2xl border border-pink-50">အထည်များ မရှိသေးပါရှင်။</div>`;
             } else {
                 filtered.forEach(p => {
                     let imageUrl = 'https://placehold.co/400x500?text=S%26S7+Fashion';
                     let isVideo = false;
 
                     if (p.colors?.[0]?.media?.[0]?.file_id) {
-                        const m = p.colors[0].media[0];
-                        imageUrl = `${API_URL}/api/image/${m.file_id}`;
-                        isVideo = m.type === 'video';
+                        imageUrl = `${API_URL}/api/image/${p.colors[0].media[0].file_id}`;
+                        isVideo = p.colors[0].media[0].type === 'video';
                     } else if (p.file_id) {
                         imageUrl = `${API_URL}/api/image/${p.file_id}`;
                         isVideo = p.type === 'video';
                     }
 
                     const mediaTag = isVideo 
-                        ? `<div class="relative w-full h-52 overflow-hidden bg-slate-900 flex items-center justify-center"><video src="${imageUrl}" muted loop autoplay playsinline class="w-full h-full object-cover pointer-events-none"></video></div>`
+                        ? `<div class="relative w-full h-52 overflow-hidden bg-slate-900 flex items-center justify-center"><video src="${imageUrl}" muted loop autoplay playsinline class="w-full h-full object-cover"></video></div>`
                         : `<img src="${imageUrl}" class="w-full h-52 object-cover bg-slate-50">`;
 
                     container.innerHTML += `
                         <div onclick="openDetailModal('${p._id}')" class="bg-white border border-pink-50/60 rounded-2xl overflow-hidden flex flex-col justify-between cursor-pointer p-2.5 shadow-2xs">
-                            <div class="overflow-hidden rounded-xl relative">
-                                ${mediaTag}
-                            </div>
+                            <div class="overflow-hidden rounded-xl relative">${mediaTag}</div>
                             <div class="pt-2.5 px-1">
                                 <h3 class="font-bold text-xs text-slate-800 line-clamp-1">${p.name || 'Untitled'}</h3>
                                 <p class="text-[10px] text-pink-500 font-bold mt-1 tracking-widest uppercase">အသေးစိတ်ကြည့်ရန်</p>
                             </div>
-                        </div>
-                    `;
+                        </div>`;
                 });
             }
-
             document.getElementById('sub-menu-view').classList.add('hidden');
             document.getElementById('product-view').classList.remove('hidden');
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -303,20 +286,35 @@
         function backToRootMenu() {
             document.getElementById('sub-menu-view').classList.add('hidden');
             document.getElementById('root-menu-view').classList.remove('hidden');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
-
         function backToSubMenu() {
             document.getElementById('product-view').classList.add('hidden');
             document.getElementById('sub-menu-view').classList.remove('hidden');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // 🔮 PREMIUM PINCH TO ZOOM LOGIC FOR SMARTPHONES
+        function selectSize(btn) {
+            document.querySelectorAll('.target-size').forEach(b => {
+                b.classList.remove('text-pink-600', 'bg-pink-50/50', 'border-pink-200');
+                b.classList.add('text-slate-600', 'border-slate-200');
+            });
+            btn.classList.remove('text-slate-600', 'border-slate-200');
+            btn.classList.add('text-pink-600', 'bg-pink-50/50', 'border-pink-200');
+            currentSelectedSize = btn.innerText;
+        }
+
+        function changeQty(amt) {
+            currentDetailQty += amt;
+            if (currentDetailQty < 1) currentDetailQty = 1;
+            document.getElementById('detail-qty').innerText = currentDetailQty;
+        }
+
+        // 🔮 INTERACTIVE MULTI-MEDIA DECODER WITH ADVANCED ZOOM & PAN
         function openDetailModal(productId) {
             const product = allProducts.find(p => p._id === productId);
             if (!product) return;
 
+            currentDetailQty = 1;
+            document.getElementById('detail-qty').innerText = "1";
             document.getElementById('detail-title').innerText = product.name || 'Untitled';
             document.getElementById('detail-desc').innerText = product.description || 'အညွှန်း မရှိပါ။';
             document.getElementById('detail-add-btn').setAttribute('onclick', `CartFromDetail('${product._id}', '${product.name || "Premium Item"}')`);
@@ -339,30 +337,27 @@
             if (mediaList.length > 0) {
                 mediaList.forEach((m, idx) => {
                     const mediaUrl = `${API_URL}/api/image/${m.file_id}`;
-                    let slideHtml = `<div class="w-full h-full flex-shrink-0 snap-center relative flex items-center justify-center p-2">`;
+                    let slideHtml = `<div class="w-full h-full flex-shrink-0 snap-center relative flex items-center justify-center p-1">`;
                     
                     if (m.type === 'video') {
-                        slideHtml += `<video src="${mediaUrl}" controls playsinline class="w-full h-full max-h-[40vh] object-contain rounded-2xl bg-black/50"></video>`;
+                        slideHtml += `<video src="${mediaUrl}" controls playsinline class="w-full h-full max-h-[42vh] object-contain rounded-2xl bg-black"></video>`;
                     } else {
-                        // Pinch container Wrapper
                         slideHtml += `
                             <div class="zoom-container" id="zoom-wrap-${idx}">
-                                <img src="${mediaUrl}" class="zoomable-media rounded-2xl shadow-md" alt="fashion-item">
-                            </div>
-                        `;
+                                <img src="${mediaUrl}" class="zoomable-media rounded-2xl" alt="fashion-item">
+                            </div>`;
                     }
                     slideHtml += `</div>`;
                     sliderContainer.innerHTML += slideHtml;
                 });
                 
-                // Pinch Touch Events များ စတင်ထည့်သွင်းခြင်း
                 setTimeout(() => {
                     mediaList.forEach((m, idx) => {
                         if(m.type !== 'video') {
-                            initPinchToZoom(document.getElementById(`zoom-wrap-${idx}`));
+                            initAdvancedPinchAndPan(document.getElementById(`zoom-wrap-${idx}`));
                         }
                     });
-                }, 50);
+                }, 60);
 
                 document.getElementById('swipe-badge').classList.toggle('hidden', mediaList.length <= 1);
             } else {
@@ -374,26 +369,30 @@
             if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
         }
 
-        // 📱 လက်နှစ်ချောင်းသုံး Pinch-to-Zoom စနစ်သီးသန့် ကုဒ်တွက်ချက်မှုအပိုင်း
-        function initPinchToZoom(container) {
+        // 📱 ADVANCED NON-CONFLICT PINCH TO ZOOM & DRAG LOGIC
+        function initAdvancedPinchAndPan(container) {
             if (!container) return;
             const img = container.querySelector('.zoomable-media');
             const slider = document.getElementById('detail-media-slider');
             if (!img) return;
 
-            let scale = 1;
-            let startDist = 0;
-            let initialScale = 1;
+            let scale = 1, startDist = 0, initialScale = 1;
+            let posX = 0, posY = 0, startX = 0, startY = 0, isDragging = false;
 
             container.addEventListener('touchstart', (e) => {
                 if (e.touches.length === 2) {
-                    // လက်နှစ်ချောင်းအကြား အကွာအဝေးကို စတင်မှတ်သားခြင်း
+                    // Zoom စတင်ခြင်း
                     startDist = Math.hypot(
                         e.touches[0].pageX - e.touches[1].pageX,
                         e.touches[0].pageY - e.touches[1].pageY
                     );
                     initialScale = scale;
-                    // ပုံကိုချဲ့နေစဉ် Gallery slide လှည့်မသွားအောင် ခေတ္တပိတ်ထားခြင်း
+                    slider.style.overflowX = 'hidden'; // Slider ပိတ်မည်
+                } else if (e.touches.length === 1 && scale > 1) {
+                    // ပုံချဲ့ထားချိန်တွင် လက်တစ်ချောင်းတည်းဖြင့် ပုံထဲလိုက်ရွှေ့ကြည့်ခြင်း (Pan)
+                    isDragging = true;
+                    startX = e.touches[0].pageX - posX;
+                    startY = e.touches[0].pageY - posY;
                     slider.style.overflowX = 'hidden'; 
                 }
             });
@@ -404,26 +403,36 @@
                         e.touches[0].pageX - e.touches[1].pageX,
                         e.touches[0].pageY - e.touches[1].pageY
                     );
-                    
-                    // Scale အသစ်တွက်ချက်ခြင်း
                     scale = (currentDist / startDist) * initialScale;
                     
-                    // အနိမ့်ဆုံး မူလအရွယ်အစား (1) နှင့် အမြင့်ဆုံး (4) ဆအထိပဲ ချဲ့ခွင့်ပြုမည်
                     if (scale < 1) scale = 1;
                     if (scale > 4) scale = 4;
 
-                    img.style.transform = `scale(${scale})`;
+                    if (scale === 1) { posX = 0; posY = 0; }
+                    img.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`;
+                } else if (e.touches.length === 1 && isDragging && scale > 1) {
+                    posX = e.touches[0].pageX - startX;
+                    posY = e.touches[0].pageY - startY;
+                    
+                    // ပုံဘောင်အပြင်ဘက် လွန်မသွားစေရန် ထိန်းချုပ်ခြင်း
+                    const maxPan = (scale - 1) * 60; 
+                    if (posX > maxPan) posX = maxPan;
+                    if (posX < -maxPan) posX = -maxPan;
+                    if (posY > maxPan) posY = maxPan;
+                    if (posY < -maxPan) posY = -maxPan;
+
+                    img.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`;
                 }
             });
 
             container.addEventListener('touchend', (e) => {
-                if (e.touches.length < 2) {
-                    startDist = 0;
-                    // လက်ပြန်လွှတ်လိုက်လို့ မူလအရွယ်အစားနီးပါးဖြစ်သွားရင် 1 အတိုင်း ပြန်ဖြစ်သွားစေရန်
+                if (e.touches.length < 2) startDist = 0;
+                if (e.touches.length === 0) {
+                    isDragging = false;
                     if (scale <= 1.1) {
-                        scale = 1;
-                        img.style.transform = `scale(1)`;
-                        slider.style.overflowX = 'auto'; // Gallery slide ကို ပြန်ဖွင့်ပေးခြင်း
+                        scale = 1; posX = 0; posY = 0;
+                        img.style.transform = `translate(0px, 0px) scale(1)`;
+                        slider.style.overflowX = 'auto'; // မူလအရွယ်ရောက်မှ Swipe Slider ပြန်ဖွင့်ပေးမည်
                     }
                 }
             });
@@ -435,13 +444,16 @@
         }
 
         function CartFromDetail(id, name) {
-            addToCart(id, name);
+            const orderName = `${name} (${currentSelectedSize})`;
+            for(let i=0; i<currentDetailQty; i++) {
+                addToCart(id, orderName);
+            }
             closeDetailModal();
             toggleCartModal(); 
         }
 
         function addToCart(id, name) {
-            let item = cart.find(x => x.id === id);
+            let item = cart.find(x => x.name === name); // Size ပါကွဲပြားအောင် နာမည်နဲ့ စစ်ဆေးသည်
             if (item) { item.qty++; } else { cart.push({ id, name, qty: 1 }); }
             updateCartUI();
             if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
@@ -465,8 +477,7 @@
                             <p class="font-bold text-xs text-slate-700">${item.name}</p>
                         </div>
                         <span class="luxury-gradient text-white px-3 py-1 rounded-xl text-[10px] font-black">QTY: ${item.qty}</span>
-                    </div>
-                `;
+                    </div>`;
             });
         }
 
