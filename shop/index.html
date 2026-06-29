@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-    <title>S&S7 Fashion - 3D Ultra Luxury Hub</title>
+    <title>S&S7 Fashion - Premium 3D Luxury Hub</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
@@ -11,21 +11,21 @@
         body { 
             font-family: 'Plus Jakarta Sans', 'Pyidaungsu', sans-serif; 
             background: linear-gradient(180deg, #fdf2f8 0%, #f8fafc 100%);
-            perspective: 1000px; /* For 3D Effects */
+            perspective: 1000px;
         }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         .luxury-gradient { background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%); }
-        .luxury-glow { box-shadow: 0 10px 25px -5px rgba(236, 72, 153, 0.35); }
+        .luxury-glow { box-shadow: 0 8px 20px -5px rgba(236, 72, 153, 0.3); }
         .glass-blur { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px); }
         
-        /* 3D Glass Card Effect */
+        /* 3D Card Tilt Effect */
         .card-3d {
             transform-style: preserve-3d;
             transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
 
-        /* Ultimate Touch Zoom Container */
+        /* Seamless Zoom & Swipe Wrapper */
         .zoom-container {
             overflow: hidden;
             width: 100%;
@@ -39,20 +39,18 @@
         .zoomable-media {
             user-select: none;
             -webkit-user-drag: none;
-            max-height: 45vh;
+            max-height: 44vh;
             object-fit: contain;
             width: 100%;
             height: 100%;
             will-change: transform;
             transform-origin: center center;
-            transition: transform 0.1s ease-out;
         }
     </style>
 </head>
 <body class="p-4 min-h-screen text-slate-800 pb-24">
 
-    <!-- Top Header -->
-    <div class="flex justify-between items-center glass-blur p-4 rounded-3xl border border-pink-100/50 mb-6 sticky top-0 z-40 shadow-xs">
+    <div class="flex justify-between items-center glass-blur p-4 rounded-3xl border border-pink-100/50 mb-5 sticky top-0 z-40 shadow-xs">
         <div>
             <h1 class="text-xl font-black tracking-wider bg-gradient-to-r from-pink-500 to-violet-600 bg-clip-text text-transparent">S&S7 FASHION</h1>
             <p id="user-greeting" class="text-[10px] text-pink-500 font-bold tracking-wide mt-0.5">COLLECTION 2026 ✨</p>
@@ -63,9 +61,8 @@
         </div>
     </div>
 
-    <!-- Views -->
     <div id="root-menu-view" class="space-y-4">
-        <div class="mb-4 px-1">
+        <div class="mb-2 px-1">
             <h2 class="text-xs font-black text-pink-500 uppercase tracking-widest">ပင်မကဏ္ဍများ (Categories)</h2>
         </div>
         <div id="root-cards-grid" class="grid grid-cols-1 gap-4">
@@ -74,7 +71,7 @@
     </div>
 
     <div id="sub-menu-view" class="hidden space-y-4">
-        <div class="flex items-center justify-between mb-5 px-1">
+        <div class="flex items-center justify-between mb-4 px-1">
             <button onclick="backToRootMenu()" class="flex items-center gap-1.5 text-xs font-bold text-pink-500 bg-white border border-pink-100 px-3 py-2 rounded-xl active:scale-95 transition-all">← ပင်မမီနူး</button>
             <h2 class="text-xs font-black text-white luxury-gradient px-3 py-2 rounded-xl tracking-wider uppercase luxury-glow">ကဏ္ဍခွဲများ</h2>
         </div>
@@ -82,50 +79,43 @@
     </div>
 
     <div id="product-view" class="hidden">
-        <div class="flex items-center justify-between mb-5 px-1">
+        <div class="flex items-center justify-between mb-4 px-1">
             <button onclick="backToSubMenu()" class="flex items-center gap-1.5 text-xs font-bold text-pink-500 bg-white border border-pink-100 px-3 py-2 rounded-xl active:scale-95 transition-all">← နောက်သို့</button>
             <h2 id="current-sub-title" class="text-xs font-black text-white luxury-gradient px-3 py-2 rounded-xl tracking-wider uppercase luxury-glow">---</h2>
         </div>
-        <div id="shop-container" class="grid grid-cols-2 gap-4"></div>
+        <div id="shop-container" class="grid grid-cols-2 gap-3"></div>
     </div>
 
-    <!-- 3D Enhanced Detail Modal -->
     <div id="detail-modal" class="hidden fixed inset-0 bg-black/85 z-50 flex items-end justify-center transition-all duration-300">
-        <div class="bg-white w-full max-w-md rounded-t-[2.5rem] shadow-2xl max-h-[92vh] relative border-t border-pink-50 flex flex-col overflow-hidden card-3d">
+        <div class="bg-white w-full max-w-md rounded-t-[2.5rem] shadow-2xl max-h-[88vh] relative border-t border-pink-50 flex flex-col overflow-hidden card-3d">
             
             <div class="absolute top-4 right-4 z-50">
-                <button onclick="closeDetailModal()" class="w-9 h-9 bg-black/50 backdrop-blur-md text-white rounded-full text-xl font-bold flex items-center justify-center active:scale-90 shadow-lg">&times;</button>
+                <button onclick="closeDetailModal()" class="w-8 h-8 bg-black/40 backdrop-blur-md text-white rounded-full text-lg font-bold flex items-center justify-center active:scale-90 shadow-md">&times;</button>
             </div>
 
-            <!-- Swipe Gallery Viewport -->
-            <div class="relative w-full h-[48vh] bg-slate-950 rounded-t-[2.5rem] overflow-hidden flex-shrink-0">
-                <!-- Swiper Wrapper -->
+            <div class="relative w-full h-[44vh] bg-slate-950 rounded-t-[2.5rem] overflow-hidden flex-shrink-0">
                 <div id="detail-media-slider" class="w-full h-full flex overflow-x-auto snap-x snap-mandatory no-scrollbar items-center scroll-smooth"></div>
                 
-                <!-- Helper Badge -->
-                <div class="absolute bottom-3 left-3 right-3 flex justify-between items-center px-3 py-2 bg-black/60 rounded-xl backdrop-blur-md pointer-events-none">
-                    <span id="swipe-badge" class="text-white text-[10px] font-bold tracking-widest uppercase animate-pulse">↔ Swipe ပွတ်ဆွဲကြည့်ရန်</span>
-                    <span class="text-white text-[10px] font-medium tracking-wide">👆 လက်၂ချောင်းဖြင့် ချဲ့နိုင်သည်</span>
+                <div class="absolute bottom-3 left-3 right-3 flex justify-between items-center px-3 py-1.5 bg-black/60 rounded-xl backdrop-blur-md pointer-events-none">
+                    <span id="swipe-badge" class="text-white text-[9px] font-bold tracking-widest uppercase animate-pulse">↔ Swipe ဘေးရွှေ့ရန်</span>
+                    <span class="text-white text-[9px] font-medium tracking-wide">👆 ပုံ/ဗီဒီယိုကို ချဲ့ကြည့်နိုင်သည်</span>
                 </div>
             </div>
 
-            <!-- Product Details -->
-            <div class="p-6 bg-white flex-1 flex flex-col justify-between overflow-y-auto max-h-[44vh] no-scrollbar">
-                <div class="space-y-4">
+            <div class="p-5 bg-white flex-1 flex flex-col justify-between overflow-y-auto max-h-[44vh] no-scrollbar">
+                <div class="space-y-3">
                     <div>
-                        <span class="text-[9px] font-bold uppercase tracking-widest text-pink-600 bg-pink-50 px-2.5 py-1 rounded-lg border border-pink-100">Premium Fashion</span>
-                        <h2 id="detail-title" class="text-base font-black text-slate-800 tracking-tight leading-snug mt-2">Product Title</h2>
+                        <span class="text-[8px] font-bold uppercase tracking-widest text-pink-600 bg-pink-50 px-2 py-0.5 rounded-md border border-pink-100">Premium Fashion</span>
+                        <h2 id="detail-title" class="text-sm font-black text-slate-800 tracking-tight leading-snug mt-1">Product Title</h2>
                     </div>
                     
-                    <!-- Description Only -->
-                    <div class="border-t border-slate-100 pt-3">
-                        <p id="detail-desc" class="text-xs text-slate-600 leading-relaxed whitespace-pre-line tracking-wide">Description...</p>
+                    <div class="border-t border-slate-100 pt-2">
+                        <p id="detail-desc" class="text-[11px] text-slate-600 leading-relaxed whitespace-pre-line tracking-wide">Description...</p>
                     </div>
                 </div>
 
-                <!-- Action Button -->
-                <div class="mt-6">
-                    <button id="detail-add-btn" class="w-full luxury-gradient text-white py-4 rounded-2xl font-bold tracking-widest luxury-glow active:scale-98 transition-all text-xs uppercase">
+                <div class="mt-4 pt-2">
+                    <button id="detail-add-btn" class="w-full luxury-gradient text-white py-3 rounded-xl font-bold tracking-widest luxury-glow active:scale-98 transition-all text-xs uppercase flex items-center justify-center gap-2">
                         🛍️ ခြင်းတောင်းထဲထည့်မည်
                     </button>
                 </div>
@@ -133,7 +123,6 @@
         </div>
     </div>
 
-    <!-- Cart Modal -->
     <div id="cart-modal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-end justify-center">
         <div class="bg-white w-full max-w-md rounded-t-[2.5rem] p-6 shadow-2xl max-h-[80vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-5 border-b border-pink-50 pb-3">
@@ -194,7 +183,6 @@
         }
 
         function openSubMenu(rootId, rootName) {
-            document.getElementById('parent-menu-title')?.removeAttribute('id'); 
             const grid = document.getElementById('sub-cards-grid');
             grid.innerHTML = '';
             const subMenus = allCategories.filter(c => c.parent_id === rootId);
@@ -245,15 +233,15 @@
                     }
 
                     const mediaTag = isVideo 
-                        ? `<div class="relative w-full h-52 overflow-hidden bg-slate-900 flex items-center justify-center"><video src="${imageUrl}" muted loop autoplay playsinline class="w-full h-full object-cover"></video></div>`
-                        : `<img src="${imageUrl}" class="w-full h-52 object-cover bg-slate-50">`;
+                        ? `<div class="relative w-full h-48 overflow-hidden bg-slate-900 flex items-center justify-center"><video src="${imageUrl}" muted loop autoplay playsinline class="w-full h-full object-cover pointer-events-none"></video></div>`
+                        : `<img src="${imageUrl}" class="w-full h-48 object-cover bg-slate-50">`;
 
                     container.innerHTML += `
-                        <div onclick="openDetailModal('${p._id}')" class="bg-white border border-pink-50/60 rounded-2xl overflow-hidden flex flex-col justify-between cursor-pointer p-2.5 shadow-2xs card-3d-trigger">
+                        <div onclick="openDetailModal('${p._id}')" class="bg-white border border-pink-50/60 rounded-2xl overflow-hidden flex flex-col justify-between cursor-pointer p-2 shadow-2xs card-3d-trigger">
                             <div class="overflow-hidden rounded-xl relative">${mediaTag}</div>
-                            <div class="pt-2.5 px-1">
-                                <h3 class="font-bold text-xs text-slate-800 line-clamp-1">${p.name || 'Untitled'}</h3>
-                                <p class="text-[10px] text-pink-500 font-bold mt-1 tracking-widest uppercase">ကြည့်ရှုရန်</p>
+                            <div class="pt-2 px-1 pb-1">
+                                <h3 class="font-bold text-[11px] text-slate-800 line-clamp-1">${p.name || 'Untitled'}</h3>
+                                <p class="text-[9px] text-pink-500 font-bold mt-0.5 tracking-wider uppercase">ကြည့်ရှုရန်</p>
                             </div>
                         </div>`;
                 });
@@ -273,24 +261,21 @@
             document.getElementById('sub-menu-view').classList.remove('hidden');
         }
 
-        // 📱 LUXURY 3D CARD TILT EFFECT FOR MOBILE TOUCH
         function init3DEffect() {
             document.querySelectorAll('.card-3d-trigger').forEach(card => {
                 card.addEventListener('mousemove', (e) => {
                     const rect = card.getBoundingClientRect();
                     const x = e.clientX - rect.left - (rect.width/2);
                     const y = e.clientY - rect.top - (rect.height/2);
-                    card.style.transform = `rotateY(${x * 0.1}deg) rotateX(${-y * 0.1}deg) scale(1.02)`;
-                    card.style.boxShadow = `0 15px 30px rgba(236, 72, 153, 0.15)`;
+                    card.style.transform = `rotateY(${x * 0.08}deg) rotateX(${-y * 0.08}deg) scale(1.01)`;
                 });
                 card.addEventListener('mouseleave', () => {
                     card.style.transform = `rotateY(0deg) rotateX(0deg) scale(1)`;
-                    card.style.boxShadow = 'none';
                 });
             });
         }
 
-        // 🔮 OPEN MODAL & INTRODUCE SEAMLESS SWIPE + ZOOM LOGIC
+        // 🔮 OPEN MODAL - WORKS PERFECTLY FOR BOTH IMAGE & VIDEO ZOOM
         function openDetailModal(productId) {
             const product = allProducts.find(p => p._id === productId);
             if (!product) return;
@@ -317,11 +302,16 @@
             if (mediaList.length > 0) {
                 mediaList.forEach((m, idx) => {
                     const mediaUrl = `${API_URL}/api/image/${m.file_id}`;
-                    let slideHtml = `<div class="w-full h-full flex-shrink-0 snap-center relative flex items-center justify-center p-1">`;
+                    let slideHtml = `<div class="w-full h-full flex-shrink-0 snap-center relative flex items-center justify-center p-1.5">`;
                     
                     if (m.type === 'video') {
-                        slideHtml += `<video src="${mediaUrl}" controls playsinline class="w-full h-full max-h-[45vh] object-contain rounded-2xl bg-black"></video>`;
+                        // Embedded video with Zoom Wrapper
+                        slideHtml += `
+                            <div class="zoom-container" id="zoom-wrap-${idx}">
+                                <video src="${mediaUrl}" loop autoplay muted playsinline controls class="zoomable-media rounded-2xl bg-black"></video>
+                            </div>`;
                     } else {
+                        // Image with Zoom Wrapper
                         slideHtml += `
                             <div class="zoom-container" id="zoom-wrap-${idx}">
                                 <img src="${mediaUrl}" class="zoomable-media rounded-2xl" alt="fashion-item">
@@ -331,12 +321,10 @@
                     sliderContainer.innerHTML += slideHtml;
                 });
                 
-                // Active Zoom Control Fix
+                // Active Smart Interaction Fix
                 setTimeout(() => {
                     mediaList.forEach((m, idx) => {
-                        if(m.type !== 'video') {
-                            bindSmartZoomAndPan(document.getElementById(`zoom-wrap-${idx}`));
-                        }
+                        bindSmartZoomAndPan(document.getElementById(`zoom-wrap-${idx}`));
                     });
                 }, 100);
 
@@ -346,87 +334,92 @@
                 document.getElementById('swipe-badge').classList.add('hidden');
             }
 
-            // 3D Tilt Pop effect on Modal Open
+            // Smooth Pop Entrance
             const modalBox = document.querySelector('.card-3d');
-            modalBox.style.transform = 'translateY(100px) rotateX(10deg)';
+            modalBox.style.transform = 'translateY(80px)';
             document.getElementById('detail-modal').classList.remove('hidden');
             
             setTimeout(() => {
-                modalBox.style.transition = 'transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
-                modalBox.style.transform = 'translateY(0) rotateX(0deg)';
-            }, 50);
+                modalBox.style.transition = 'transform 0.35s cubic-bezier(0.1, 0.8, 0.2, 1)';
+                modalBox.style.transform = 'translateY(0)';
+            }, 30);
 
             if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
         }
 
-        // 🌟 SMART NON-CONFLICT ZOOM & SWIPE LOGIC
+        // 📱 ULTIMATE TOUCH EVENT RE-ENGINEERED (SWIPE + ZOOM FIX)
         function bindSmartZoomAndPan(container) {
             if (!container) return;
-            const img = container.querySelector('.zoomable-media');
+            const targetMedia = container.querySelector('.zoomable-media');
             const slider = document.getElementById('detail-media-slider');
-            if (!img) return;
+            if (!targetMedia) return;
 
             let scale = 1, startDist = 0, initialScale = 1;
             let posX = 0, posY = 0, startX = 0, startY = 0, isDragging = false;
 
+            // Prevent default touch tracking inside container when zoom is active
             container.addEventListener('touchstart', (e) => {
                 if (e.touches.length === 2) {
-                    // Zoom စလုပ်ချိန်တွင် Swipe Slider ရွှေ့မရအောင် Scroll Lock ချလိုက်မည်
-                    slider.style.overflowX = 'hidden'; 
+                    e.stopPropagation();
+                    slider.style.overflowX = 'hidden'; // Stop Slide Gesture immediately
                     startDist = Math.hypot(
-                        e.touches[0].pageX - e.touches[1].pageX,
-                        e.touches[0].pageY - e.touches[1].pageY
+                        e.touches[0].clientX - e.touches[1].clientX,
+                        e.touches[0].clientY - e.touches[1].clientY
                     );
                     initialScale = scale;
                 } else if (e.touches.length === 1 && scale > 1) {
-                    // ပုံချဲ့ထားချိန်တွင် ဘေးရွှေ့ကြည့်ရန် Lock လုပ်ခြင်း
+                    e.stopPropagation();
                     slider.style.overflowX = 'hidden'; 
                     isDragging = true;
-                    startX = e.touches[0].pageX - posX;
-                    startY = e.touches[0].pageY - posY;
+                    startX = e.touches[0].clientX - posX;
+                    startY = e.touches[0].clientY - posY;
                 }
-            }, { passive: true });
+            }, { passive: false });
 
             container.addEventListener('touchmove', (e) => {
                 if (e.touches.length === 2 && startDist > 0) {
+                    e.preventDefault();
+                    e.stopPropagation();
                     const currentDist = Math.hypot(
-                        e.touches[0].pageX - e.touches[1].pageX,
-                        e.touches[0].pageY - e.touches[1].pageY
+                        e.touches[0].clientX - e.touches[1].clientX,
+                        e.touches[0].clientY - e.touches[1].clientY
                     );
                     scale = (currentDist / startDist) * initialScale;
                     
                     if (scale < 1) scale = 1;
-                    if (scale > 4) scale = 4;
+                    if (scale > 3.5) scale = 3.5;
 
                     if (scale === 1) { posX = 0; posY = 0; }
-                    img.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`;
+                    targetMedia.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`;
                 } else if (e.touches.length === 1 && isDragging && scale > 1) {
-                    posX = e.touches[0].pageX - startX;
-                    posY = e.touches[0].pageY - startY;
+                    e.preventDefault();
+                    e.stopPropagation();
+                    posX = e.touches[0].clientX - startX;
+                    posY = e.touches[0].clientY - startY;
                     
-                    // ပုံဘောင်မလွတ်စေရန် ထိန်းညှိခြင်း
-                    const maxPan = (scale - 1) * 80; 
-                    if (posX > maxPan) posX = maxPan;
-                    if (posX < -maxPan) posX = -maxPan;
-                    if (posY > maxPan) posY = maxPan;
-                    if (posY < -maxPan) posY = -maxPan;
+                    // Box Constrain Boundaries
+                    const boundary = (scale - 1) * 90;
+                    if (posX > boundary) posX = boundary;
+                    if (posX < -boundary) posX = -boundary;
+                    if (posY > boundary) posY = boundary;
+                    if (posY < -boundary) posY = -boundary;
 
-                    img.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`;
+                    targetMedia.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`;
                 }
-            }, { passive: true });
+            }, { passive: false });
 
             container.addEventListener('touchend', (e) => {
                 if (e.touches.length < 2) startDist = 0;
                 if (e.touches.length === 0) {
                     isDragging = false;
-                    // လက်လွှတ်လိုက်လို့ ပုံက မူလအရွယ်ပြန်ဖြစ်သွားရင် Swipe ပြန်ဖွင့်ပေးမည်
-                    if (scale <= 1.1) {
+                    // Reset to Base Frame & Re-enable Slider Scroll
+                    if (scale <= 1.05) {
                         scale = 1; posX = 0; posY = 0;
-                        img.style.transform = `translate(0px, 0px) scale(1)`;
+                        targetMedia.style.transform = `translate(0px, 0px) scale(1)`;
                         slider.style.overflowX = 'auto'; 
                     }
                 }
-            });
+            }, { passive: true });
         }
 
         function closeDetailModal() {
