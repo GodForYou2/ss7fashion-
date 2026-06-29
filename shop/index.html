@@ -11,6 +11,7 @@
         body { 
             font-family: 'Plus Jakarta Sans', 'Pyidaungsu', sans-serif; 
             background: linear-gradient(180deg, #fff1f2 0%, #fcf8fa 100%);
+            -webkit-tap-highlight-color: transparent;
         }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
@@ -18,7 +19,7 @@
         .luxury-glow { box-shadow: 0 8px 25px -5px rgba(236, 72, 153, 0.35); }
         .glass-blur { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px); }
 
-        /* ✨ Luxury Card Styles with Animations */
+        /* ✨ Luxury Card Styles */
         .luxury-card {
             background: #ffffff;
             border: 1px solid rgba(244, 63, 94, 0.08);
@@ -32,20 +33,14 @@
                 border-color: #f43f5e;
                 box-shadow: 0 15px 30px -10px rgba(244, 63, 94, 0.25);
             }
-            .luxury-card:hover .arrow-icon {
-                transform: translateX(5px);
-                color: #f43f5e;
-            }
-            .luxury-card::after {
-                content: ''; position: absolute; top: 0; left: -150%; width: 50%; height: 100%;
-                background: linear-gradient(to right, transparent, rgba(255, 192, 203, 0.4), transparent);
-                transform: skewX(-25deg); transition: 0.75s;
-            }
-            .luxury-card:hover::after { left: 150%; }
         }
-        .luxury-card:active {
-            transform: scale(0.97); background-color: #fff1f2; border-color: #ec4899;
-        }
+        .luxury-card:active { transform: scale(0.97); background-color: #fff1f2; border-color: #ec4899; }
+
+        /* 🌌 Premium Lightbox Touch Slider Setup */
+        .lb-slider-container { position: relative; width: 100%; height: 100%; overflow: hidden; touch-action: none; }
+        .lb-slider-track { display: flex; width: 100%; height: 100%; will-change: transform; transition: transform 0.3s cubic-bezier(0.1, 0.8, 0.25, 1); }
+        .lb-slide-item { flex: 0 0 100%; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; background-color: transparent; }
+        .lightbox-zoom-target { max-width: 100%; max-height: 85vh; object-fit: contain; will-change: transform; transform-origin: center center; user-select: none; -webkit-user-drag: none; }
     </style>
 </head>
 <body class="p-4 min-h-screen text-slate-800 pb-24">
@@ -62,9 +57,7 @@
     </div>
 
     <div id="root-menu-view" class="space-y-4">
-        <div class="mb-2 px-1">
-            <h2 class="text-xs font-black text-rose-500 uppercase tracking-widest flex items-center gap-1">🌸 ပင်မကဏ္ဍများ <span class="text-[10px] animate-pulse">✨</span></h2>
-        </div>
+        <div class="mb-2 px-1"><h2 class="text-xs font-black text-rose-500 uppercase tracking-widest flex items-center gap-1">🌸 ပင်မကဏ္ဍများ</h2></div>
         <div id="root-cards-grid" class="grid grid-cols-1 gap-4">
             <p id="root-loading" class="text-center text-rose-400 font-medium my-12 text-xs animate-pulse">🌸 မီနူးများကို ဖတ်ရှုနေပါသည်...</p>
         </div>
@@ -73,7 +66,7 @@
     <div id="sub-menu-view" class="hidden space-y-4">
         <div class="flex items-center justify-between mb-4 px-1">
             <button onclick="backToRootMenu()" class="flex items-center gap-1.5 text-xs font-bold text-rose-500 bg-white border border-rose-100 px-3 py-2 rounded-xl active:scale-95 transition-all">← ပင်မမီနူး</button>
-            <h2 class="text-xs font-black text-white luxury-gradient px-3 py-2 rounded-xl tracking-wider uppercase luxury-glow">ကဏ္ဍခွဲများ</h2>
+            <h2 class="text-xs font-black text-white luxury-gradient px-3 py-2 rounded-xl tracking-wider">ကဏ္ဍခွဲများ</h2>
         </div>
         <div id="sub-cards-grid" class="grid grid-cols-1 gap-4"></div>
     </div>
@@ -81,13 +74,10 @@
     <div id="product-view" class="hidden">
         <div class="flex items-center justify-between mb-4 px-1">
             <button onclick="backToSubMenu()" class="flex items-center gap-1.5 text-xs font-bold text-rose-500 bg-white border border-rose-100 px-3 py-2 rounded-xl active:scale-95 transition-all">← နောက်သို့</button>
-            <h2 id="current-sub-title" class="text-xs font-black text-white luxury-gradient px-3 py-2 rounded-xl tracking-wider uppercase luxury-glow">---</h2>
+            <h2 id="current-sub-title" class="text-xs font-black text-white luxury-gradient px-3 py-2 rounded-xl tracking-wider">---</h2>
         </div>
         <div id="shop-container" class="grid grid-cols-2 gap-3"></div>
-        
-        <div id="lazy-loading-trigger" class="text-center text-rose-400 text-xs py-5 hidden font-medium animate-pulse">
-            🌸 ပစ္စည်းအသစ်များ ထပ်မံဆွဲတင်နေပါသည်...
-        </div>
+        <div id="lazy-loading-trigger" class="text-center text-rose-400 text-xs py-5 hidden font-medium animate-pulse">🌸 ပစ္စည်းအသစ်များ ထပ်မံဆွဲတင်နေပါသည်...</div>
     </div>
 
     <div id="detail-modal" class="hidden fixed inset-0 bg-black/85 z-50 flex items-end justify-center transition-all duration-300">
@@ -98,8 +88,8 @@
             
             <div class="relative w-full h-[42vh] bg-slate-950 rounded-t-[2.5rem] overflow-hidden flex-shrink-0">
                 <div id="detail-media-grid" class="w-full h-full gap-0.5 grid"></div>
-                <div class="absolute top-4 left-4 right-4 flex justify-between items-center pointer-events-none drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)]">
-                    <span id="swipe-badge" class="text-white text-[10px] font-bold tracking-widest uppercase bg-black/30 px-2 py-1 rounded-md backdrop-blur-xs">✨ ပုံကြီးကြည့်ရန် နှိပ်ပါ</span>
+                <div class="absolute top-4 left-4 right-4 flex justify-between items-center pointer-events-none">
+                    <span id="swipe-badge" class="text-white text-[10px] font-bold tracking-widest bg-black/30 px-2 py-1 rounded-md backdrop-blur-xs">✨ ပုံကြီးကြည့်ရန် နှိပ်ပါ</span>
                 </div>
             </div>
 
@@ -110,11 +100,11 @@
                         <h2 id="detail-title" class="text-sm font-black text-slate-800 tracking-tight leading-snug mt-1">Product Title</h2>
                     </div>
                     <div class="border-t border-slate-100 pt-2">
-                        <p id="detail-desc" class="text-[11px] text-slate-600 leading-relaxed whitespace-pre-line tracking-wide">Description...</p>
+                        <p id="detail-desc" class="text-[11px] text-slate-600 leading-relaxed whitespace-pre-line">Description...</p>
                     </div>
                 </div>
                 <div class="mt-4 pt-1">
-                    <button id="detail-add-btn" class="w-full luxury-gradient text-white py-3 rounded-xl font-bold tracking-widest luxury-glow active:scale-98 transition-all text-xs uppercase flex items-center justify-center gap-2">
+                    <button id="detail-add-btn" class="w-full luxury-gradient text-white py-3 rounded-xl font-bold tracking-widest luxury-glow active:scale-98 transition-all text-xs uppercase">
                         🛍️ ခြင်းတောင်းထဲထည့်မည်
                     </button>
                 </div>
@@ -122,14 +112,13 @@
         </div>
     </div>
 
-    <div id="lightbox-modal" class="hidden fixed inset-0 bg-black/95 z-[100] flex flex-col items-center justify-center">
-        <button onclick="closeLightbox()" class="absolute top-6 right-6 w-10 h-10 bg-white/20 text-white rounded-full text-2xl font-bold flex items-center justify-center active:scale-90 z-50">&times;</button>
+    <div id="lightbox-modal" class="hidden fixed inset-0 bg-black z-[100] flex flex-col items-center justify-center select-none overflow-hidden">
+        <button onclick="closeLightbox()" class="absolute top-6 right-6 w-10 h-10 bg-black/40 text-white rounded-full text-2xl font-bold flex items-center justify-center active:scale-90 z-[110] shadow-lg border border-white/10 backdrop-blur-xs">&times;</button>
         
-        <div id="lightbox-content" class="w-full h-full flex items-center justify-center p-4"></div>
+        <div class="absolute top-7 left-6 z-[110] text-white/90 font-mono font-bold text-xs tracking-widest bg-black/40 px-3 py-1.5 rounded-xl border border-white/5 backdrop-blur-xs" id="lightbox-counter">1/1</div>
         
-        <div id="lightbox-nav" class="absolute bottom-10 flex gap-12 z-50">
-            <button onclick="navigateLightbox(-1)" class="bg-white/20 active:bg-white/40 text-white px-5 py-2.5 rounded-xl font-bold text-xs tracking-wider border border-white/10 shadow-lg">← ရှေ့သို့</button>
-            <button onclick="navigateLightbox(1)" class="bg-white/20 active:bg-white/40 text-white px-5 py-2.5 rounded-xl font-bold text-xs tracking-wider border border-white/10 shadow-lg">နောက်သို့ →</button>
+        <div id="lightbox-slider-box" class="lb-slider-container">
+            <div id="lightbox-slider-track" class="lb-slider-track"></div>
         </div>
     </div>
 
@@ -141,9 +130,7 @@
             </div>
             <div id="cart-items" class="space-y-3 overflow-y-auto pr-1 no-scrollbar flex-1 max-h-[48vh]"></div>
             <div class="border-t border-rose-50 mt-5 pt-4 flex-shrink-0">
-                <button onclick="toggleCartModal()" class="w-full luxury-gradient text-white py-3.5 rounded-2xl font-bold luxury-glow active:scale-95 transition-all text-xs uppercase tracking-widest">
-                    ✨ ပစ္စည်း ထပ်ကြည့်မည်
-                </button>
+                <button onclick="toggleCartModal()" class="w-full luxury-gradient text-white py-3.5 rounded-2xl font-bold luxury-glow active:scale-95 transition-all text-xs uppercase">✨ ပစ္စည်း ထပ်ကြည့်မည်</button>
             </div>
         </div>
     </div>
@@ -151,11 +138,8 @@
     <script>
         const API_URL = "https://myshop-1833.onrender.com"; 
         let allProducts = [], allCategories = [], cart = [];
-        
         let filteredProducts = [];
-        let itemsToShow = 20;
-        let currentLoadedCount = 0;
-        let isViewActive = false;
+        let itemsToShow = 20, currentLoadedCount = 0, isViewActive = false;
 
         let tg = window.Telegram.WebApp;
         tg.ready(); tg.expand();
@@ -164,7 +148,6 @@
             document.getElementById('user-greeting').innerText = `မင်္ဂလာပါ ${tg.initDataUnsafe.user.first_name} ✨`;
         }
 
-        // 📥 Load Data from Backend
         async function loadShopData() {
             try {
                 const catResponse = await fetch(`${API_URL}/api/categories`);
@@ -183,7 +166,6 @@
             renderRootCategories();
         }
 
-        // 🏷️ Render Root Categories
         function renderRootCategories() {
             const grid = document.getElementById('root-cards-grid');
             grid.innerHTML = '';
@@ -201,12 +183,10 @@
             });
         }
 
-        // 🏷️ Open Sub Categories View
         function openSubMenu(rootId, rootName) {
             const grid = document.getElementById('sub-cards-grid');
             grid.innerHTML = '';
             const subMenus = allCategories.filter(c => c.parent_id === rootId);
-
             if(subMenus.length === 0) {
                 grid.innerHTML = `<p class="text-center text-slate-400 text-xs py-8 bg-white rounded-2xl border border-rose-100">မီနူးခွဲများ မရှိသေးပါရှင်။</p>`;
             } else {
@@ -227,43 +207,32 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // 👗 Select SubCategory & Prepare Lazy Loading
         function selectSubCategory(subId, subName) {
             document.getElementById('current-sub-title').innerText = subName;
             const container = document.getElementById('shop-container');
             container.innerHTML = '';
-
             filteredProducts = allProducts.filter(p => {
                 const pCatId = p.category_id || p.category;
                 return pCatId && pCatId.toString().trim().toLowerCase() === subId.toString().trim().toLowerCase();
             });
-
-            currentLoadedCount = 0; 
-            isViewActive = true;
-
+            currentLoadedCount = 0; isViewActive = true;
             if (filteredProducts.length === 0) {
                 container.innerHTML = `<div class="col-span-2 text-center text-slate-400 my-8 text-xs bg-white p-6 rounded-2xl border border-rose-50">အထည်များ မရှိသေးပါရှင်။</div>`;
-            } else {
-                appendNextBatch();
-            }
-
+            } else { appendNextBatch(); }
             document.getElementById('sub-menu-view').classList.add('hidden');
             document.getElementById('product-view').classList.remove('hidden');
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // 🚀 Lazy Loading Engine (Append Batch Products)
         function appendNextBatch() {
             if (!isViewActive) return;
             const container = document.getElementById('shop-container');
             const nextBatch = filteredProducts.slice(currentLoadedCount, currentLoadedCount + itemsToShow);
-            
             if (nextBatch.length === 0) return;
 
             nextBatch.forEach(p => {
                 let imageUrl = 'https://placehold.co/400x500?text=S%26S7+Fashion';
                 let isVideo = false;
-
                 if (p.colors?.[0]?.media?.[0]?.file_id) {
                     imageUrl = `${API_URL}/api/image/${p.colors[0].media[0].file_id}`;
                     isVideo = p.colors[0].media[0].type === 'video';
@@ -271,7 +240,6 @@
                     imageUrl = `${API_URL}/api/image/${p.file_id}`;
                     isVideo = p.type === 'video';
                 }
-
                 const mediaTag = isVideo 
                     ? `<div class="relative w-full h-44 overflow-hidden bg-slate-900 flex items-center justify-center"><video src="${imageUrl}" muted loop autoplay playsinline webkit-playsinline class="w-full h-full object-cover pointer-events-none"></video></div>`
                     : `<img src="${imageUrl}" class="w-full h-44 object-cover bg-slate-50" loading="lazy">`;
@@ -285,47 +253,30 @@
                         </div>
                     </div>`;
             });
-
             currentLoadedCount += nextBatch.length;
             toggleLoadingIndicator();
         }
 
         function toggleLoadingIndicator() {
             const indicator = document.getElementById('lazy-loading-trigger');
-            if (currentLoadedCount < filteredProducts.length) {
-                indicator.classList.remove('hidden');
-            } else {
-                indicator.classList.add('hidden');
-            }
+            if (currentLoadedCount < filteredProducts.length) { indicator.classList.remove('hidden'); } 
+            else { indicator.classList.add('hidden'); }
         }
 
-        // Scroll Event Listener for Infinite Scroll
         window.addEventListener('scroll', () => {
             if (!isViewActive) return;
             if ((window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight - 120) {
-                if (currentLoadedCount < filteredProducts.length) {
-                    appendNextBatch();
-                }
+                if (currentLoadedCount < filteredProducts.length) { appendNextBatch(); }
             }
         });
 
-        // Navigation Controllers
-        function backToRootMenu() {
-            isViewActive = false;
-            document.getElementById('sub-menu-view').classList.add('hidden');
-            document.getElementById('root-menu-view').classList.remove('hidden');
-        }
-        function backToSubMenu() {
-            isViewActive = false;
-            document.getElementById('product-view').classList.add('hidden');
-            document.getElementById('sub-menu-view').classList.remove('hidden');
-        }
+        function backToRootMenu() { isViewActive = false; document.getElementById('sub-menu-view').classList.add('hidden'); document.getElementById('root-menu-view').classList.remove('hidden'); }
+        function backToSubMenu() { isViewActive = false; document.getElementById('product-view').classList.add('hidden'); document.getElementById('sub-menu-view').classList.remove('hidden'); }
 
-        // Global Variable for Lightbox Engine
+        // Lightbox Engines Globals
         let globalMediaList = [];
         let currentLightboxIndex = 0;
 
-        // 🔍 Open Detail Modal & Generate Facebook Style Grid
         function openDetailModal(productId) {
             const product = allProducts.find(p => p._id === productId);
             if (!product) return;
@@ -348,55 +299,45 @@
                 mediaList.push({ file_id: product.file_id, type: product.type || 'image' });
             }
 
-            globalMediaList = mediaList; // Lightbox အတွက် သိမ်းဆည်းခြင်း
+            globalMediaList = mediaList;
             renderFacebookGrid(mediaList);
-
             document.getElementById('detail-modal').classList.remove('hidden');
             if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
         }
 
-        // 🖼️ Helper function to create Media Tags dynamically
         function createGridMediaHtml(m, classStr, index) {
             const mediaUrl = `${API_URL}/api/image/${m.file_id}`;
             if (m.type === 'video') {
-                return `<video src="${mediaUrl}" muted loop autoplay playsinline webkit-playsinline preload="auto" class="${classStr} object-cover cursor-pointer" onclick="openLightbox(${index})"></video>`;
+                return `<video src="${mediaUrl}" muted loop autoplay playsinline webkit-playsinline class="${classStr} object-cover cursor-pointer" onclick="openLightbox(${index})"></video>`;
             } else {
                 return `<img src="${mediaUrl}" class="${classStr} object-cover cursor-pointer" onclick="openLightbox(${index})" alt="fashion">`;
             }
         }
 
-        // 🧩 Facebook Mosaic Grid Dynamic Renderer Engine
         function renderFacebookGrid(mediaList) {
             const gridContainer = document.getElementById('detail-media-grid');
-            gridContainer.className = "w-full h-full gap-0.5 grid"; // Class ကို ပြန်ရှင်းထုတ်ပေးရန်
+            gridContainer.className = "w-full h-full gap-0.5 grid";
             gridContainer.innerHTML = '';
 
             if (mediaList.length === 0) {
                 gridContainer.classList.add('grid-cols-1');
                 gridContainer.innerHTML = `<div class="w-full h-full flex items-center justify-center text-slate-400 text-xs">No Media</div>`;
-                document.getElementById('swipe-badge').classList.add('hidden');
                 return;
             }
-
-            document.getElementById('swipe-badge').classList.remove('hidden');
 
             if (mediaList.length === 1) {
                 gridContainer.classList.add('grid-cols-1');
                 gridContainer.innerHTML = createGridMediaHtml(mediaList[0], 'w-full h-full !object-contain bg-slate-900', 0);
-            } 
-            else if (mediaList.length === 2) {
+            } else if (mediaList.length === 2) {
                 gridContainer.classList.add('grid-cols-2');
                 gridContainer.innerHTML += createGridMediaHtml(mediaList[0], 'w-full h-full', 0);
                 gridContainer.innerHTML += createGridMediaHtml(mediaList[1], 'w-full h-full', 1);
-            } 
-            else if (mediaList.length === 3) {
+            } else if (mediaList.length === 3) {
                 gridContainer.classList.add('grid-cols-2');
                 gridContainer.innerHTML += `<div class="row-span-2 w-full h-full">${createGridMediaHtml(mediaList[0], 'w-full h-full', 0)}</div>`;
                 gridContainer.innerHTML += `<div class="w-full h-[21vh]">${createGridMediaHtml(mediaList[1], 'w-full h-full', 1)}</div>`;
                 gridContainer.innerHTML += `<div class="w-full h-[21vh]">${createGridMediaHtml(mediaList[2], 'w-full h-full', 2)}</div>`;
-            } 
-            else {
-                // ၄ ခု သို့မဟုတ် ၄ ခုထက်ပိုလျှင်
+            } else {
                 gridContainer.classList.add('grid-cols-2');
                 gridContainer.innerHTML += `<div class="w-full h-[21vh]">${createGridMediaHtml(mediaList[0], 'w-full h-full', 0)}</div>`;
                 gridContainer.innerHTML += `<div class="w-full h-[21vh]">${createGridMediaHtml(mediaList[1], 'w-full h-full', 1)}</div>`;
@@ -405,12 +346,9 @@
                 const remaining = mediaList.length - 4;
                 if (remaining > 0) {
                     const mediaUrl = `${API_URL}/api/image/${mediaList[3].file_id}`;
-                    let overlayHtml = '';
-                    if (mediaList[3].type === 'video') {
-                        overlayHtml = `<video src="${mediaUrl}" muted loop autoplay playsinline webkit-playsinline class="w-full h-full object-cover brightness-40"></video>`;
-                    } else {
-                        overlayHtml = `<img src="${mediaUrl}" class="w-full h-full object-cover brightness-40" alt="more">`;
-                    }
+                    let overlayHtml = mediaList[3].type === 'video' 
+                        ? `<video src="${mediaUrl}" muted loop autoplay playsinline webkit-playsinline class="w-full h-full object-cover brightness-40"></video>`
+                        : `<img src="${mediaUrl}" class="w-full h-full object-cover brightness-40">`;
                     gridContainer.innerHTML += `
                         <div class="w-full h-[21vh] relative cursor-pointer" onclick="openLightbox(3)">
                             ${overlayHtml}
@@ -422,73 +360,173 @@
             }
         }
 
-        // 🌌 Open Fullscreen Lightbox View
+        // 🌌 Open Fullscreen Button-less Lightbox View
         function openLightbox(index) {
             currentLightboxIndex = index;
-            document.getElementById('lightbox-modal').classList.remove('hidden');
+            const modal = document.getElementById('lightbox-modal');
+            const track = document.getElementById('lightbox-slider-track');
+            track.innerHTML = '';
             
-            // ပုံ ၁ ပုံတည်းဆိုရင် Next/Prev ခလုတ်ပိတ်ထားရန်
-            document.getElementById('lightbox-nav').classList.toggle('hidden', globalMediaList.length <= 1);
+            document.getElementById('lightbox-counter').innerText = `${currentLightboxIndex + 1}/${globalMediaList.length}`;
+
+            globalMediaList.forEach((m) => {
+                const mediaUrl = `${API_URL}/api/image/${m.file_id}`;
+                let itemHtml = `<div class="lb-slide-item">`;
+                if (m.type === 'video') {
+                    itemHtml += `<video src="${mediaUrl}" controls autoplay loop playsinline webkit-playsinline class="lightbox-zoom-target" style="transform: translate(0px, 0px) scale(1);"></video>`;
+                } else {
+                    itemHtml += `<img src="${mediaUrl}" class="lightbox-zoom-target" style="transform: translate(0px, 0px) scale(1);" alt="lightbox-view">`;
+                }
+                itemHtml += `</div>`;
+                track.innerHTML += itemHtml;
+            });
+
+            modal.classList.remove('hidden');
             
-            renderLightboxMedia();
+            const containerWidth = document.getElementById('lightbox-slider-box').offsetWidth;
+            track.style.transition = 'none';
+            track.style.transform = `translateX(${-currentLightboxIndex * containerWidth}px)`;
+
+            initFacebookStyleTouchEngine();
             if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
         }
 
-        // 🔄 Render Active Media inside Lightbox
-        function renderLightboxMedia() {
-            const content = document.getElementById('lightbox-content');
-            const media = globalMediaList[currentLightboxIndex];
-            const mediaUrl = `${API_URL}/api/image/${media.file_id}`;
-            content.innerHTML = '';
+        // 🎛️ Facebook & Instagram Style Pure Gesture Touch Control Engine
+        function initFacebookStyleTouchEngine() {
+            const container = document.getElementById('lightbox-slider-box');
+            const track = document.getElementById('lightbox-slider-track');
+            
+            let scale = 1, panX = 0, panY = 0;
+            let isSwiping = false, isZooming = false;
+            let startX = 0, startY = 0, lastX = 0;
+            let startDist = 0, initialScale = 1;
+            let startPanX = 0, startPanY = 0;
 
-            if (media.type === 'video') {
-                content.innerHTML = `<video src="${mediaUrl}" controls autoplay loop playsinline webkit-playsinline class="max-w-full max-h-[75vh] object-contain rounded-xl"></video>`;
-            } else {
-                content.innerHTML = `<img src="${mediaUrl}" class="max-w-full max-h-[75vh] object-contain rounded-xl" alt="lightbox-img">`;
-            }
-        }
+            container.addEventListener('touchstart', (e) => {
+                const activeMedia = track.children[currentLightboxIndex]?.querySelector('.lightbox-zoom-target');
+                
+                if (e.touches.length === 2) {
+                    // လက်နှစ်ချောင်းဆိုရင် Zoom Engine အလုပ်လုပ်မည် (Swipe လုံးဝပိတ်ထားမည်)
+                    isZooming = true; isSwiping = false;
+                    startDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+                    initialScale = scale;
+                } 
+                else if (e.touches.length === 1) {
+                    if (scale > 1) {
+                        // Zoom ချဲ့ထားချိန် လက်တစ်ချောင်းတည်းဖြင့် ပုံအတွင်းလှည့်ပတ်ကြည့်ရှုခြင်း (Pan Mode)
+                        isZooming = true; isSwiping = false;
+                        startPanX = e.touches[0].clientX - panX;
+                        startPanY = e.touches[0].clientY - panY;
+                    } else {
+                        // ပုံမှန်အရွယ်အစားဆိုလျှင် လက်တစ်ချောင်းတည်းဖြင့် ဘေးသို့ ပွတ်ဆွဲခြင်း (Swipe Mode)
+                        isSwiping = true; isZooming = false;
+                        startX = e.touches[0].clientX;
+                        startY = e.touches[0].clientY;
+                        lastX = startX;
+                        track.style.transition = 'none';
+                    }
+                }
+            }, { passive: false });
 
-        // ↔️ Lightbox Arrow Navigation Controller
-        function navigateLightbox(direction) {
-            currentLightboxIndex += direction;
-            if (currentLightboxIndex < 0) currentLightboxIndex = globalMediaList.length - 1;
-            if (currentLightboxIndex >= globalMediaList.length) currentLightboxIndex = 0;
-            renderLightboxMedia();
-            if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+            container.addEventListener('touchmove', (e) => {
+                const activeMedia = track.children[currentLightboxIndex]?.querySelector('.lightbox-zoom-target');
+                
+                if (isZooming && e.touches.length === 2) {
+                    e.preventDefault(); // Telegram WebApp window ဆွဲတင်မိတာမျိုးမဖြစ်အောင် ကာကွယ်ခြင်း
+                    const currentDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+                    scale = (currentDist / startDist) * initialScale;
+                    
+                    if (scale < 1) scale = 1; if (scale > 4) scale = 4;
+                    if (scale === 1) { panX = 0; panY = 0; }
+                    if (activeMedia) activeMedia.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
+                } 
+                else if (isZooming && e.touches.length === 1 && scale > 1) {
+                    e.preventDefault();
+                    panX = e.touches[0].clientX - startPanX;
+                    panY = e.touches[0].clientY - startPanY;
+                    
+                    // ပုံအစွန်းတွေ ဘောင်ကျော်ပြီး အလွတ်ကြီးမဖြစ်သွားအောင် Boundary Limit ထိန်းချုပ်ခြင်း
+                    const limitX = (scale - 1) * (container.offsetWidth / 2.2);
+                    const limitY = (scale - 1) * (container.offsetHeight / 2.2);
+                    if (panX > limitX) panX = limitX; if (panX < -limitX) panX = -limitX;
+                    if (panY > limitY) panY = limitY; if (panY < -limitY) panY = -limitY;
+                    
+                    if (activeMedia) activeMedia.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
+                } 
+                else if (isSwiping && e.touches.length === 1 && scale === 1) {
+                    lastX = e.touches[0].clientX;
+                    let diffX = lastX - startX;
+                    let diffY = e.touches[0].clientY - startY;
+                    
+                    // ဒေါင်လိုက် scroll နဲ့မရောထွေးအောင် ဘေးတိုက်ရွှေ့မှု ပိုများမှသာ Swipe လုပ်ခွင့်ပြုမည်
+                    if (Math.abs(diffX) > Math.abs(diffY)) {
+                        e.preventDefault();
+                        let baseTranslate = -currentLightboxIndex * container.offsetWidth;
+                        track.style.transform = `translateX(${baseTranslate + diffX}px)`;
+                    }
+                }
+            }, { passive: false });
+
+            container.addEventListener('touchend', (e) => {
+                const activeMedia = track.children[currentLightboxIndex]?.querySelector('.lightbox-zoom-target');
+                
+                if (isSwiping) {
+                    isSwiping = false;
+                    let diffX = lastX - startX;
+                    let swipeThreshold = container.offsetWidth * 0.2; // ပုံရဲ့ ၂၀% အကွာအဝေးဆွဲမိရင် Slider လှန်မည်
+                    
+                    track.style.transition = 'transform 0.3s cubic-bezier(0.1, 0.8, 0.25, 1)';
+                    
+                    if (diffX < -swipeThreshold && currentLightboxIndex < globalMediaList.length - 1) {
+                        currentLightboxIndex++;
+                    } else if (diffX > swipeThreshold && currentLightboxIndex > 0) {
+                        currentLightboxIndex--;
+                    }
+                    
+                    track.style.transform = `translateX(${-currentLightboxIndex * container.offsetWidth}px)`;
+                    document.getElementById('lightbox-counter').innerText = `${currentLightboxIndex + 1}/${globalMediaList.length}`;
+                    
+                    // Slide အသစ်ရောက်သွားရင် တခြားပုံဟောင်းတွေရဲ့ Zoom Level တွေကို Reset ချပေးခြင်း
+                    scale = 1; panX = 0; panY = 0;
+                    Array.from(track.children).forEach(slide => {
+                        const m = slide.querySelector('.lightbox-zoom-target');
+                        if (m) m.style.transform = 'translate(0px, 0px) scale(1)';
+                    });
+                }
+                
+                if (e.touches.length === 0) {
+                    isZooming = false;
+                    // Zoom အရမ်းသေးသွားရင် မူရင်း ၁ ဆ (1x) သို့ Elastic ပုံစံ အလိုအလျောက် ပြန်ရောက်သွားစေခြင်း
+                    if (scale <= 1.05) {
+                        scale = 1; panX = 0; panY = 0;
+                        if (activeMedia) {
+                            activeMedia.style.transition = 'transform 0.2s ease-out';
+                            activeMedia.style.transform = `translate(0px, 0px) scale(1)`;
+                            setTimeout(() => { if(activeMedia) activeMedia.style.transition = 'none'; }, 200);
+                        }
+                    }
+                }
+            });
         }
 
         function closeLightbox() {
             document.getElementById('lightbox-modal').classList.add('hidden');
-            document.getElementById('lightbox-content').innerHTML = '';
+            document.getElementById('lightbox-slider-track').innerHTML = '';
         }
 
-        // 🛍️ Add to Cart Action with file_id Injection
         function addToCart(id, name, fileId) {
             let item = cart.find(x => x.id === id);
-            if (item) { 
-                item.qty++; 
-            } else { 
-                cart.push({ 
-                    id, 
-                    name, 
-                    qty: 1, 
-                    file_id: fileId || null 
-                }); 
-            }
-            updateCartUI(); 
-            closeDetailModal(); 
-            toggleCartModal();
+            if (item) { item.qty++; } else { cart.push({ id, name, qty: 1, file_id: fileId || null }); }
+            updateCartUI(); closeDetailModal(); toggleCartModal();
             if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
         }
 
-        // 🗑️ Remove Item from Cart Function
         function removeFromCart(id) {
             cart = cart.filter(item => item.id !== id);
             updateCartUI();
             if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
         }
 
-        // 🛒 Render Cart UI dynamically
         function updateCartUI() {
             document.getElementById('cart-count').innerText = cart.reduce((sum, item) => sum + item.qty, 0);
             const cartItemsContainer = document.getElementById('cart-items');
@@ -506,27 +544,18 @@
                             <p class="font-bold text-xs text-slate-700">✨ ${item.name}</p>
                             <span class="text-[10px] text-slate-400">အရေအတွက်: ${item.qty} ထည်</span>
                         </div>
-                        <button onclick="removeFromCart('${item.id}')" class="text-rose-500 bg-rose-50 hover:bg-rose-100 p-2 rounded-xl text-xs active:scale-90 transition-all border border-rose-100">
-                            🗑️ ဖျက်မယ်
-                        </button>
+                        <button onclick="removeFromCart('${item.id}')" class="text-rose-500 bg-rose-50 hover:bg-rose-100 p-2 rounded-xl text-xs active:scale-90 transition-all border border-rose-100">🗑️ ဖျက်မယ်</button>
                     </div>`;
             });
             
             cartItemsContainer.innerHTML += `
-                <button onclick="sendOrderToBot()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white py-3.5 rounded-2xl font-bold active:scale-95 transition-all text-xs uppercase tracking-widest mt-4 shadow-md shadow-emerald-200">
-                    ✅ အော်ဒါတင်မည် (Confirm Order)
-                </button>
+                <button onclick="sendOrderToBot()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white py-3.5 rounded-2xl font-bold active:scale-95 transition-all text-xs uppercase tracking-widest mt-4 shadow-md shadow-emerald-200">✅ အော်ဒါတင်မည် (Confirm Order)</button>
             `;
         }
 
-        // 🚀 Send Data Back to Telegram Bot
         function sendOrderToBot() {
             if (cart.length === 0) return;
-            const orderData = {
-                action: "NEW_ORDER",
-                items: cart
-            };
-            tg.sendData(JSON.stringify(orderData));
+            tg.sendData(JSON.stringify({ action: "NEW_ORDER", items: cart }));
             tg.close();
         }
 
@@ -538,7 +567,6 @@
 
         function toggleCartModal() { document.getElementById('cart-modal').classList.toggle('hidden'); }
 
-        // Start Application Engine
         loadShopData();
     </script>
 </body>
