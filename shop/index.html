@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-    <title>S&S7 Fashion - Premium 3D Luxury Hub</title>
+    <title>S&S7 Fashion - Smooth Swipe Hub</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
@@ -11,45 +11,44 @@
         body { 
             font-family: 'Plus Jakarta Sans', 'Pyidaungsu', sans-serif; 
             background: linear-gradient(180deg, #fdf2f8 0%, #f8fafc 100%);
-            perspective: 1000px;
         }
+        /* Native Smooth Scrolling for Swipe */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         .luxury-gradient { background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%); }
         .luxury-glow { box-shadow: 0 8px 20px -5px rgba(236, 72, 153, 0.3); }
         .glass-blur { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px); }
         
-        /* 3D Card Tilt Effect */
+        /* 3D Card Effect */
         .card-3d {
             transform-style: preserve-3d;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            transition: transform 0.2s ease;
         }
 
-        /* Seamless Zoom & Swipe Wrapper */
-        .zoom-container {
-            overflow: hidden;
+        /* Pure Native CSS Slider Container */
+        .slider-viewport {
+            display: flex;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
             width: 100%;
             height: 100%;
+        }
+        .slide-item {
+            flex: 0 0 100%;
+            width: 100%;
+            height: 100%;
+            scroll-snap-align: start;
             display: flex;
             align-items: center;
             justify-content: center;
-            touch-action: none;
-            position: relative;
-        }
-        .zoomable-media {
-            user-select: none;
-            -webkit-user-drag: none;
-            max-height: 44vh;
-            object-fit: contain;
-            width: 100%;
-            height: 100%;
-            will-change: transform;
-            transform-origin: center center;
         }
     </style>
 </head>
 <body class="p-4 min-h-screen text-slate-800 pb-24">
 
+    <!-- Top Header -->
     <div class="flex justify-between items-center glass-blur p-4 rounded-3xl border border-pink-100/50 mb-5 sticky top-0 z-40 shadow-xs">
         <div>
             <h1 class="text-xl font-black tracking-wider bg-gradient-to-r from-pink-500 to-violet-600 bg-clip-text text-transparent">S&S7 FASHION</h1>
@@ -61,6 +60,7 @@
         </div>
     </div>
 
+    <!-- Category Views -->
     <div id="root-menu-view" class="space-y-4">
         <div class="mb-2 px-1">
             <h2 class="text-xs font-black text-pink-500 uppercase tracking-widest">ပင်မကဏ္ဍများ (Categories)</h2>
@@ -86,23 +86,29 @@
         <div id="shop-container" class="grid grid-cols-2 gap-3"></div>
     </div>
 
+    <!-- Optimized & Ultra Smooth Detail Modal -->
     <div id="detail-modal" class="hidden fixed inset-0 bg-black/85 z-50 flex items-end justify-center transition-all duration-300">
-        <div class="bg-white w-full max-w-md rounded-t-[2.5rem] shadow-2xl max-h-[88vh] relative border-t border-pink-50 flex flex-col overflow-hidden card-3d">
+        <div class="bg-white w-full max-w-md rounded-t-[2.5rem] shadow-2xl max-h-[85vh] relative border-t border-pink-50 flex flex-col overflow-hidden">
             
             <div class="absolute top-4 right-4 z-50">
                 <button onclick="closeDetailModal()" class="w-8 h-8 bg-black/40 backdrop-blur-md text-white rounded-full text-lg font-bold flex items-center justify-center active:scale-90 shadow-md">&times;</button>
             </div>
 
-            <div class="relative w-full h-[44vh] bg-slate-950 rounded-t-[2.5rem] overflow-hidden flex-shrink-0">
-                <div id="detail-media-slider" class="w-full h-full flex overflow-x-auto snap-x snap-mandatory no-scrollbar items-center scroll-smooth"></div>
+            <!-- Native Swipe Viewport (Zero JS Conflict) -->
+            <div class="relative w-full h-[42vh] bg-slate-950 rounded-t-[2.5rem] overflow-hidden flex-shrink-0">
+                <div id="detail-media-slider" class="slider-viewport no-scrollbar">
+                    <!-- Slides inject dynamically here -->
+                </div>
                 
+                <!-- Overlay Guides -->
                 <div class="absolute bottom-3 left-3 right-3 flex justify-between items-center px-3 py-1.5 bg-black/60 rounded-xl backdrop-blur-md pointer-events-none">
-                    <span id="swipe-badge" class="text-white text-[9px] font-bold tracking-widest uppercase animate-pulse">↔ Swipe ဘေးရွှေ့ရန်</span>
-                    <span class="text-white text-[9px] font-medium tracking-wide">👆 ပုံ/ဗီဒီယိုကို ချဲ့ကြည့်နိုင်သည်</span>
+                    <span id="swipe-badge" class="text-white text-[9px] font-bold tracking-widest uppercase animate-pulse">↔ Swipe ဘေးသို့ရွှေ့ကြည့်ပါ</span>
+                    <span class="text-white text-[9px] font-medium tracking-wide">✨ HD Quality</span>
                 </div>
             </div>
 
-            <div class="p-5 bg-white flex-1 flex flex-col justify-between overflow-y-auto max-h-[44vh] no-scrollbar">
+            <!-- Compact Details & Spacing -->
+            <div class="p-5 bg-white flex-1 flex flex-col justify-between overflow-y-auto max-h-[43vh] no-scrollbar">
                 <div class="space-y-3">
                     <div>
                         <span class="text-[8px] font-bold uppercase tracking-widest text-pink-600 bg-pink-50 px-2 py-0.5 rounded-md border border-pink-100">Premium Fashion</span>
@@ -114,7 +120,8 @@
                     </div>
                 </div>
 
-                <div class="mt-4 pt-2">
+                <!-- Compact Action Button -->
+                <div class="mt-4 pt-1">
                     <button id="detail-add-btn" class="w-full luxury-gradient text-white py-3 rounded-xl font-bold tracking-widest luxury-glow active:scale-98 transition-all text-xs uppercase flex items-center justify-center gap-2">
                         🛍️ ခြင်းတောင်းထဲထည့်မည်
                     </button>
@@ -123,6 +130,7 @@
         </div>
     </div>
 
+    <!-- Cart Modal -->
     <div id="cart-modal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-end justify-center">
         <div class="bg-white w-full max-w-md rounded-t-[2.5rem] p-6 shadow-2xl max-h-[80vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-5 border-b border-pink-50 pb-3">
@@ -233,8 +241,8 @@
                     }
 
                     const mediaTag = isVideo 
-                        ? `<div class="relative w-full h-48 overflow-hidden bg-slate-900 flex items-center justify-center"><video src="${imageUrl}" muted loop autoplay playsinline class="w-full h-full object-cover pointer-events-none"></video></div>`
-                        : `<img src="${imageUrl}" class="w-full h-48 object-cover bg-slate-50">`;
+                        ? `<div class="relative w-full h-44 overflow-hidden bg-slate-900 flex items-center justify-center"><video src="${imageUrl}" muted loop autoplay playsinline class="w-full h-full object-cover pointer-events-none"></video></div>`
+                        : `<img src="${imageUrl}" class="w-full h-44 object-cover bg-slate-50">`;
 
                     container.innerHTML += `
                         <div onclick="openDetailModal('${p._id}')" class="bg-white border border-pink-50/60 rounded-2xl overflow-hidden flex flex-col justify-between cursor-pointer p-2 shadow-2xs card-3d-trigger">
@@ -267,7 +275,7 @@
                     const rect = card.getBoundingClientRect();
                     const x = e.clientX - rect.left - (rect.width/2);
                     const y = e.clientY - rect.top - (rect.height/2);
-                    card.style.transform = `rotateY(${x * 0.08}deg) rotateX(${-y * 0.08}deg) scale(1.01)`;
+                    card.style.transform = `rotateY(${x * 0.05}deg) rotateX(${-y * 0.05}deg) scale(1.01)`;
                 });
                 card.addEventListener('mouseleave', () => {
                     card.style.transform = `rotateY(0deg) rotateX(0deg) scale(1)`;
@@ -275,7 +283,7 @@
             });
         }
 
-        // 🔮 OPEN MODAL - WORKS PERFECTLY FOR BOTH IMAGE & VIDEO ZOOM
+        // 🔮 OPEN MODAL WITH NATIVE ULTRA-SMOOTH SWIPE
         function openDetailModal(productId) {
             const product = allProducts.find(p => p._id === productId);
             if (!product) return;
@@ -300,126 +308,36 @@
             }
 
             if (mediaList.length > 0) {
-                mediaList.forEach((m, idx) => {
+                mediaList.forEach((m) => {
                     const mediaUrl = `${API_URL}/api/image/${m.file_id}`;
-                    let slideHtml = `<div class="w-full h-full flex-shrink-0 snap-center relative flex items-center justify-center p-1.5">`;
+                    let slideHtml = `<div class="slide-item">`;
                     
                     if (m.type === 'video') {
-                        // Embedded video with Zoom Wrapper
-                        slideHtml += `
-                            <div class="zoom-container" id="zoom-wrap-${idx}">
-                                <video src="${mediaUrl}" loop autoplay muted playsinline controls class="zoomable-media rounded-2xl bg-black"></video>
-                            </div>`;
+                        slideHtml += `<video src="${mediaUrl}" loop autoplay muted playsinline controls class="max-w-full max-h-full object-contain rounded-2xl bg-black"></video>`;
                     } else {
-                        // Image with Zoom Wrapper
-                        slideHtml += `
-                            <div class="zoom-container" id="zoom-wrap-${idx}">
-                                <img src="${mediaUrl}" class="zoomable-media rounded-2xl" alt="fashion-item">
-                            </div>`;
+                        slideHtml += `<img src="${mediaUrl}" class="max-w-full max-h-full object-contain rounded-2xl" alt="fashion-item">`;
                     }
                     slideHtml += `</div>`;
                     sliderContainer.innerHTML += slideHtml;
                 });
                 
-                // Active Smart Interaction Fix
-                setTimeout(() => {
-                    mediaList.forEach((m, idx) => {
-                        bindSmartZoomAndPan(document.getElementById(`zoom-wrap-${idx}`));
-                    });
-                }, 100);
-
                 document.getElementById('swipe-badge').classList.toggle('hidden', mediaList.length <= 1);
             } else {
-                sliderContainer.innerHTML = `<div class="w-full h-full flex items-center justify-center text-slate-400 text-xs bg-slate-900">No Image</div>`;
+                sliderContainer.innerHTML = `<div class="slide-item text-slate-400 text-xs bg-slate-900">No Image</div>`;
                 document.getElementById('swipe-badge').classList.add('hidden');
             }
 
-            // Smooth Pop Entrance
-            const modalBox = document.querySelector('.card-3d');
-            modalBox.style.transform = 'translateY(80px)';
+            // Pop Animation
+            const modalBox = document.querySelector('#detail-modal > div');
+            modalBox.style.transform = 'translateY(100px)';
             document.getElementById('detail-modal').classList.remove('hidden');
             
             setTimeout(() => {
-                modalBox.style.transition = 'transform 0.35s cubic-bezier(0.1, 0.8, 0.2, 1)';
+                modalBox.style.transition = 'transform 0.3s ease-out';
                 modalBox.style.transform = 'translateY(0)';
-            }, 30);
+            }, 20);
 
             if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
-        }
-
-        // 📱 ULTIMATE TOUCH EVENT RE-ENGINEERED (SWIPE + ZOOM FIX)
-        function bindSmartZoomAndPan(container) {
-            if (!container) return;
-            const targetMedia = container.querySelector('.zoomable-media');
-            const slider = document.getElementById('detail-media-slider');
-            if (!targetMedia) return;
-
-            let scale = 1, startDist = 0, initialScale = 1;
-            let posX = 0, posY = 0, startX = 0, startY = 0, isDragging = false;
-
-            // Prevent default touch tracking inside container when zoom is active
-            container.addEventListener('touchstart', (e) => {
-                if (e.touches.length === 2) {
-                    e.stopPropagation();
-                    slider.style.overflowX = 'hidden'; // Stop Slide Gesture immediately
-                    startDist = Math.hypot(
-                        e.touches[0].clientX - e.touches[1].clientX,
-                        e.touches[0].clientY - e.touches[1].clientY
-                    );
-                    initialScale = scale;
-                } else if (e.touches.length === 1 && scale > 1) {
-                    e.stopPropagation();
-                    slider.style.overflowX = 'hidden'; 
-                    isDragging = true;
-                    startX = e.touches[0].clientX - posX;
-                    startY = e.touches[0].clientY - posY;
-                }
-            }, { passive: false });
-
-            container.addEventListener('touchmove', (e) => {
-                if (e.touches.length === 2 && startDist > 0) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    const currentDist = Math.hypot(
-                        e.touches[0].clientX - e.touches[1].clientX,
-                        e.touches[0].clientY - e.touches[1].clientY
-                    );
-                    scale = (currentDist / startDist) * initialScale;
-                    
-                    if (scale < 1) scale = 1;
-                    if (scale > 3.5) scale = 3.5;
-
-                    if (scale === 1) { posX = 0; posY = 0; }
-                    targetMedia.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`;
-                } else if (e.touches.length === 1 && isDragging && scale > 1) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    posX = e.touches[0].clientX - startX;
-                    posY = e.touches[0].clientY - startY;
-                    
-                    // Box Constrain Boundaries
-                    const boundary = (scale - 1) * 90;
-                    if (posX > boundary) posX = boundary;
-                    if (posX < -boundary) posX = -boundary;
-                    if (posY > boundary) posY = boundary;
-                    if (posY < -boundary) posY = -boundary;
-
-                    targetMedia.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`;
-                }
-            }, { passive: false });
-
-            container.addEventListener('touchend', (e) => {
-                if (e.touches.length < 2) startDist = 0;
-                if (e.touches.length === 0) {
-                    isDragging = false;
-                    // Reset to Base Frame & Re-enable Slider Scroll
-                    if (scale <= 1.05) {
-                        scale = 1; posX = 0; posY = 0;
-                        targetMedia.style.transform = `translate(0px, 0px) scale(1)`;
-                        slider.style.overflowX = 'auto'; 
-                    }
-                }
-            }, { passive: true });
         }
 
         function closeDetailModal() {
