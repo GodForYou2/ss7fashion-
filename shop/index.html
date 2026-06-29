@@ -156,21 +156,11 @@
                 const name = tg.initDataUnsafe.user.first_name;
                 greetingElement.innerText = `မင်္ဂလာပါ ${name} ✨`;
             } else {
-                const urlParams = new URLSearchParams(window.location.search);
-                const userId = urlParams.get('user_id');
-                if (userId) {
-                    greetingElement.innerText = `မင်္ဂလာပါ ✨`; 
-                } else {
-                    greetingElement.innerText = "မင်္ဂလာပါ ✨";
-                }
+                greetingElement.innerText = "မင်္ဂလာပါ ✨";
             }
         }
 
         setGreeting();
-
-        if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-            document.getElementById('user-greeting').innerText = `မင်္ဂလာပါ ${tg.initDataUnsafe.user.first_name} ✨`;
-        }
 
         async function loadShopData() {
             try {
@@ -191,7 +181,7 @@
             initRandomBannerCarousel();
         }
 
-        // 🎯 Wave Pay / KPay Style Random Banner Carousel Engine
+        // 🎯 Improved Banner Carousel Engine (ဗီဒီယိုနှင့် ပုံ စနစ်တကျခွဲခြားပြသရန် Update ပြုလုပ်ပြီး)
         function initRandomBannerCarousel() {
             if (allProducts.length === 0) return;
 
@@ -204,16 +194,26 @@
             track.innerHTML = ''; dotsContainer.innerHTML = '';
 
             bannerItems.forEach((p, idx) => {
-                let imageUrl = 'https://placehold.co/600x300?text=S%26S7+Premium';
+                let mediaUrl = 'https://placehold.co/600x300?text=S%26S7+Premium';
+                let isVideo = false;
+
+                // Media Format & Type စစ်ဆေးခြင်း
                 if (p.colors?.[0]?.media?.[0]?.file_id) {
-                    imageUrl = `${API_URL}/api/image/${p.colors[0].media[0].file_id}`;
+                    mediaUrl = `${API_URL}/api/image/${p.colors[0].media[0].file_id}`;
+                    isVideo = p.colors[0].media[0].type === 'video';
                 } else if (p.file_id) {
-                    imageUrl = `${API_URL}/api/image/${p.file_id}`;
+                    mediaUrl = `${API_URL}/api/image/${p.file_id}`;
+                    isVideo = p.type === 'video';
                 }
+
+                // ဗီဒီယို သို့မဟုတ် ပုံ Tag သတ်မှတ်ခြင်း
+                const mediaTag = isVideo 
+                    ? `<video src="${mediaUrl}" muted loop autoplay playsinline webkit-playsinline class="w-full h-full object-cover pointer-events-none"></video>`
+                    : `<img src="${mediaUrl}" class="w-full h-full object-cover" alt="promo">`;
 
                 track.innerHTML += `
                     <div onclick="openDetailModal('${p._id}')" class="flex-shrink-0 w-full h-full relative cursor-pointer overflow-hidden">
-                        <img src="${imageUrl}" class="w-full h-full object-cover" alt="promo">
+                        ${mediaTag}
                         <div class="absolute inset-0 bg-gradient-to-t from-rose-950/90 via-rose-900/30 to-transparent flex flex-col justify-end p-4 pb-7">
                             <span class="text-[8px] font-black tracking-widest text-pink-300 uppercase bg-rose-500/30 px-2 py-0.5 rounded-md w-max border border-rose-400/30 backdrop-blur-xs mb-1">✨ Weekly Popular</span>
                             <h3 class="text-white text-xs font-extrabold tracking-wide line-clamp-1 drop-shadow-sm uppercase">${p.name || 'Premium Trend'}</h3>
@@ -228,7 +228,8 @@
             let currentBannerIdx = 0;
             const totalBanners = bannerItems.length;
 
-            setInterval(() => {
+            if (window.bannerInterval) clearInterval(window.bannerInterval);
+            window.bannerInterval = setInterval(() => {
                 currentBannerIdx = (currentBannerIdx + 1) % totalBanners;
                 if(track) track.style.transform = `translateX(-${currentBannerIdx * 100}%)`;
 
@@ -263,7 +264,6 @@
         function openSubMenu(rootId, rootName) {
             const subMenus = allCategories.filter(c => c.parent_id === rootId);
             
-            // ✨ ပြင်ဆင်ချက် - Sub Menu လုံးဝမရှိလျှင် Product View ဆီ တိုက်ရိုက်သွားစေပြီး Back Button ကို Root ချိတ်ပေးခြင်း
             if (subMenus.length === 0) {
                 const backBtn = document.getElementById('product-back-btn');
                 if (backBtn) backBtn.setAttribute('onclick', 'backToRootMenu()');
@@ -306,7 +306,6 @@
                 container.innerHTML = `<div class="col-span-2 text-center text-slate-400 my-8 text-xs bg-white p-6 rounded-2xl border border-rose-50">Coming Soon</div>`;
             } else { appendNextBatch(); }
             
-            // ✨ Layout ပျက်ခြင်းမှ ကာကွယ်ရန် Root ဗျူးကိုပါ တစ်ပါတည်း ဖျောက်ပေးခြင်း
             document.getElementById('root-menu-view').classList.add('hidden');
             document.getElementById('sub-menu-view').classList.add('hidden');
             document.getElementById('product-view').classList.remove('hidden');
@@ -359,7 +358,6 @@
             }
         });
 
-        // ✨ Navigation Handles (Product View ပါ စနစ်တကျ ဖျောက်နိုင်ရန် ပေါင်းစပ်ပြီး)
         function backToRootMenu() { 
             isViewActive = false; 
             document.getElementById('sub-menu-view').classList.add('hidden'); 
@@ -372,7 +370,6 @@
             document.getElementById('sub-menu-view').classList.remove('hidden'); 
         }
 
-        // Lightbox Engines Globals
         let globalMediaList = [];
         let currentLightboxIndex = 0;
 
