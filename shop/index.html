@@ -322,7 +322,9 @@
 
             document.getElementById('detail-title').innerText = product.name || 'Untitled';
             document.getElementById('detail-desc').innerText = product.description || 'အညွှန်း မရှိပါ။';
-            document.getElementById('detail-add-btn').setAttribute('onclick', `addToCart('${product._id}', '${product.name || "Premium Item"}')`);
+            // အထည်ရဲ့ file_id ကိုပါ ခလုတ်ထဲ ထည့်ပေးလိုက်တာပါ 💡
+            const activeFileId = product.colors?.[0]?.media?.[0]?.file_id || product.file_id || "";
+            document.getElementById('detail-add-btn').setAttribute('onclick', `addToCart('${product._id}', '${product.name || "Premium Item"}', '${activeFileId}')`);
 
             const sliderTrack = document.getElementById('detail-media-slider');
             sliderTrack.innerHTML = '';
@@ -450,9 +452,18 @@
             document.getElementById('detail-media-slider').innerHTML = '';
         }
 
-        function addToCart(id, name) {
+        function addToCart(id, name, fileId) {
             let item = cart.find(x => x.id === id);
-            if (item) { item.qty++; } else { cart.push({ id, name, qty: 1 }); }
+            if (item) { 
+        item.qty++; 
+            } else { 
+        cart.push({ 
+            id, 
+            name, 
+            qty: 1, 
+            file_id: fileId || null 
+        }); 
+    }
             updateCartUI(); closeDetailModal(); toggleCartModal();
             if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
         }
