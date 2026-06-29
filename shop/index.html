@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-    <title>S&S7 Fashion - Perfect Touch Hub</title>
+    <title>S&S7 Fashion - Precision Swipe Hub</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
@@ -18,20 +18,20 @@
         .luxury-glow { box-shadow: 0 8px 20px -5px rgba(236, 72, 153, 0.3); }
         .glass-blur { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px); }
 
-        /* Multi-Media Track Container */
         .slider-container {
             position: relative;
             width: 100%;
             height: 100%;
             overflow: hidden;
-            touch-action: none; /* Crucial for internal touch control */
+            touch-action: none;
         }
         .slider-track {
             display: flex;
             width: 100%;
             height: 100%;
-            transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             will-change: transform;
+            /* Ultra precise snapping transition */
+            transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .slide-item {
             flex: 0 0 100%;
@@ -106,7 +106,7 @@
                 </div>
                 
                 <div class="absolute bottom-3 left-3 right-3 flex justify-between items-center px-3 py-1.5 bg-black/60 rounded-xl backdrop-blur-md pointer-events-none">
-                    <span id="swipe-badge" class="text-white text-[9px] font-bold tracking-widest uppercase animate-pulse">↔ Swipe ဘေးရွှေ့ / 👆 ၂ချောင်းဖြင့်ချဲ့</span>
+                    <span id="swipe-badge" class="text-white text-[9px] font-bold tracking-widest uppercase animate-pulse">↔ တစ်ပုံချင်းစီ ပွတ်ဆွဲကြည့်ပါ</span>
                     <span id="slide-index-counter" class="text-white text-[9px] font-mono">1/1</span>
                 </div>
             </div>
@@ -269,7 +269,7 @@
             document.getElementById('sub-menu-view').classList.remove('hidden');
         }
 
-        // 🌟 HIGH-PERFORMANCE CUSTOM SWIPE & ZOOM INFRASTRUCTURE
+        // 🌟 ONE SLIDE AT A TIME - STEP BY STEP PRECISION TOUCH ENGINE
         let currentSlideIndex = 0;
         let totalSlidesCount = 0;
 
@@ -314,7 +314,7 @@
                     sliderTrack.innerHTML += slideHtml;
                 });
                 document.getElementById('swipe-badge').classList.toggle('hidden', totalSlidesCount <= 1);
-                initMasterTouchLogic();
+                initPrecisionTouchEngine();
             } else {
                 sliderTrack.innerHTML = `<div class="slide-item text-slate-400 text-xs bg-slate-900">No Image</div>`;
                 document.getElementById('swipe-badge').classList.add('hidden');
@@ -324,7 +324,7 @@
             if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
         }
 
-        function initMasterTouchLogic() {
+        function initPrecisionTouchEngine() {
             const container = document.getElementById('touch-slider-box');
             const track = document.getElementById('detail-media-slider');
             
@@ -335,10 +335,7 @@
             let panX = 0, panY = 0, startPanX = 0, startPanY = 0;
 
             container.addEventListener('touchstart', (e) => {
-                const activeMedia = track.children[currentSlideIndex].querySelector('.zoomable-target');
-
                 if (e.touches.length === 2) {
-                    // Two fingers detected: Lock swipe, activate zoom mode
                     isZooming = true;
                     isSwiping = false;
                     startDist = Math.hypot(
@@ -348,18 +345,18 @@
                     initialScale = scale;
                 } else if (e.touches.length === 1) {
                     if (scale > 1) {
-                        // Drag/Pan inside zoomed asset
                         isZooming = true;
                         isSwiping = false;
                         startPanX = e.touches[0].clientX - panX;
                         startPanY = e.touches[0].clientY - panY;
                     } else {
-                        // Standard Single Swipe Gesture
+                        // Precise Swipe Lock Initialization
                         isSwiping = true;
                         isZooming = false;
                         startX = e.touches[0].clientX;
                         startY = e.touches[0].clientY;
-                        track.style.transition = 'none'; // Unbind animation for drag response
+                        currentX = startX; // Reset touch coordinates tracker
+                        track.style.transition = 'none'; 
                     }
                 }
             }, { passive: false });
@@ -378,29 +375,28 @@
                     if (scale > 4) scale = 4;
                     
                     if (scale === 1) { panX = 0; panY = 0; }
-                    activeMedia.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
+                    if (activeMedia) activeMedia.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
                 } 
                 else if (isZooming && e.touches.length === 1 && scale > 1) {
                     e.preventDefault();
                     panX = e.touches[0].clientX - startPanX;
                     panY = e.touches[0].clientY - startPanY;
                     
-                    // Constrain bounds inside view
                     const limit = (scale - 1) * 80;
                     if (panX > limit) panX = limit; if (panX < -limit) panX = -limit;
                     if (panY > limit) panY = limit; if (panY < -limit) panY = -limit;
                     
-                    activeMedia.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
+                    if (activeMedia) activeMedia.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
                 } 
                 else if (isSwiping && e.touches.length === 1 && scale === 1) {
                     currentX = e.touches[0].clientX;
                     let diffX = currentX - startX;
                     let diffY = e.touches[0].clientY - startY;
 
-                    // Confirm horizontal swipe intent rather than vertical layout scroll
                     if (Math.abs(diffX) > Math.abs(diffY)) {
                         e.preventDefault();
                         let baseTranslate = -currentSlideIndex * container.offsetWidth;
+                        // Real-time tracking display
                         track.style.transform = `translateX(${baseTranslate + diffX}px)`;
                     }
                 }
@@ -412,21 +408,25 @@
                 if (isSwiping && scale === 1) {
                     isSwiping = false;
                     let diffX = currentX - startX;
-                    let threshold = container.offsetWidth * 0.22; // 22% drag completes slide change
+                    // Minimum 45px drag distance to safely step into adjacent slide boundary
+                    let minSwipeThreshold = 45; 
 
-                    track.style.transition = 'transform 0.25s ease-out';
-                    if (diffX < -threshold && currentSlideIndex < totalSlidesCount - 1) {
-                        currentSlideIndex++;
-                    } else if (diffX > threshold && currentSlideIndex > 0) {
-                        currentSlideIndex--;
+                    track.style.transition = 'transform 0.28s cubic-bezier(0.16, 1, 0.3, 1)';
+                    
+                    // STRICT SINGLE STEP MATH: Only increments or decrements by ONE index maximum per gesture.
+                    if (diffX < -minSwipeThreshold && currentSlideIndex < totalSlidesCount - 1) {
+                        currentSlideIndex++; // Only go up by 1 step
+                    } else if (diffX > minSwipeThreshold && currentSlideIndex > 0) {
+                        currentSlideIndex--; // Only go down by 1 step
                     }
+                    
+                    // Force clean lock snap grid alignment
                     track.style.transform = `translateX(${-currentSlideIndex * container.offsetWidth}px)`;
                     document.getElementById('slide-index-counter').innerText = `${currentSlideIndex + 1}/${totalSlidesCount}`;
                 }
 
                 if (e.touches.length === 0) {
                     isZooming = false;
-                    // Auto restore layout context if scale is close to minimal baseline
                     if (scale <= 1.08) {
                         scale = 1; panX = 0; panY = 0;
                         if(activeMedia) activeMedia.style.transform = `translate(0px, 0px) scale(1)`;
