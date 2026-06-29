@@ -149,18 +149,30 @@
         
         
             // 💡 ဒီနေရာမှာ အနည်းငယ် ပြင်ပေးပါ
-    function updateGreeting() {
+
+        function setGreeting() {
+        const greetingElement = document.getElementById('user-greeting');
+        
+        // ၁။ Telegram User အချက်အလက် ရှိမရှိ စစ်မယ်
         if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-            const firstName = tg.initDataUnsafe.user.first_name || "User";
-            document.getElementById('user-greeting').innerText = `မင်္ဂလာပါ ${firstName} ✨`;
-        } else {
-            // Web ဖွင့်ရင်တောင် အဆင်ပြေအောင် Default တစ်ခုပေးထားပါ
-            document.getElementById('user-greeting').innerText = "မင်္ဂလာပါ ✨";
+            const name = tg.initDataUnsafe.user.first_name;
+            greetingElement.innerText = `မင်္ဂလာပါ ${name} ✨`;
+        } 
+        // ၂။ [အရေးကြီး] အကယ်၍ အပေါ်က မရရင် URL ထဲက user_id ကို ယူမယ်
+        else {
+            const urlParams = new URLSearchParams(window.location.search);
+            const userId = urlParams.get('user_id');
+            if (userId) {
+                // အကယ်၍ ID ပဲရရင် ID ကိုပြမယ်၊ ဒါမှမဟုတ် "မင်္ဂလာပါ" ပဲပြမယ်
+                greetingElement.innerText = `မင်္ဂလာပါ ✨`; 
+            } else {
+                greetingElement.innerText = "မင်္ဂလာပါ ✨";
+            }
         }
     }
 
-    // App ပွင့်ပွင့်ချင်း နာမည်တင်ပေးလိုက်ပါ
-    updateGreeting();
+    setGreeting();
+
             
             
 
